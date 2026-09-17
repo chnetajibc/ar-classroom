@@ -79,7 +79,10 @@ public class BoardController : MonoBehaviour
         // Board is 4.4 wide x 2.4 tall, positioned at front wall
         canvasGO.transform.localPosition = new Vector3(0, 0, 0.06f);
         canvasGO.transform.localRotation = Quaternion.identity;
-        canvasGO.transform.localScale = Vector3.one;
+        // World-space Canvas: sizeDelta is a pixel RESOLUTION, not meters, so
+        // scale it down (880px -> 4.4m, 480px -> 2.4m = 0.005). Without this the
+        // board face renders ~200x oversized and the text flies off the wall.
+        canvasGO.transform.localScale = Vector3.one * 0.005f;
 
         Canvas canvas = canvasGO.AddComponent<Canvas>();
         canvas.renderMode = RenderMode.WorldSpace;
@@ -135,13 +138,12 @@ public class BoardController : MonoBehaviour
         t.horizontalOverflow = HorizontalWrapMode.Wrap;
         t.verticalOverflow = VerticalWrapMode.Overflow;
         RectTransform rt = go.GetComponent<RectTransform>();
-        // World-space canvas: position manually via offsets
+        // World-space canvas: position manually via offsets (in canvas pixels;
+        // the parent canvas is pre-scaled 0.005 so pixels map to meters).
         rt.anchorMin = new Vector2(0, 1); rt.anchorMax = new Vector2(0, 1);
         rt.pivot = new Vector2(0, 1);
         rt.offsetMin = new Vector2(rect.x - 440, -rect.y - rect.height + 240);
         rt.offsetMax = new Vector2(rect.x - 440 + rect.width, -rect.y + 240);
-        rt.localScale = Vector3.one * 0.005f; // 200px per meter mapping tweak
-        // Fix: world canvas scale — use parent scale instead
         rt.localScale = Vector3.one;
         return t;
     }

@@ -29,6 +29,10 @@ public class CameraCorners : MonoBehaviour
 
     void Awake() { Instance = this; }
 
+    // Frame the opening shot deterministically on Play instead of relying on
+    // whatever rotation was last saved in the scene file.
+    void Start() { GoTo(0); }
+
     public int Index => index;
     public string CurrentName => corners.Length > 0 ? corners[index].name : "?";
 
@@ -36,6 +40,10 @@ public class CameraCorners : MonoBehaviour
     {
         if (corners == null || corners.Length == 0) return;
         index = ((i % corners.Length) + corners.Length) % corners.Length;
+        Vector3 toLook = corners[index].lookAt - corners[index].pos;
+        // LookAt with a zero direction triggers an IsNormalized assertion, so
+        // only move/aim when the corner actually defines a viewing direction.
+        if (toLook.sqrMagnitude < 1e-6f) return;
         transform.position = corners[index].pos;
         transform.LookAt(corners[index].lookAt);
     }

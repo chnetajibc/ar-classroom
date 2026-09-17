@@ -35,6 +35,12 @@ public class TutorController : MonoBehaviour
     GameObject bodyGO;
     GameObject headGO;
     GameObject armL, armR;
+    // Base pose stored at build so Update/CoWave work for both the FBX body
+    // (root on the floor) and the procedural fallback (body at hip height).
+    Vector3 tutorBodyBasePos = Vector3.zero;
+    Quaternion tutorHeadBaseRot = Quaternion.identity;
+    Vector3 tutorHeadBaseScale = Vector3.one;
+    bool tutorProcedural;
     GameObject bubbleGO;
     UnityEngine.UI.Text bubbleText;
     BoardController board;
@@ -54,21 +60,52 @@ public class TutorController : MonoBehaviour
     {
         // Realistic tutor: downloaded FBX standing on the floor at the tutor root.
         // (human1 file has no mesh — animation data only — so tutor uses human2,
-        // Mei at 1.699m ≈ 1.7m, scale 1.)
-        var prefab = Resources.Load<GameObject>("Models/Humans/human2");
-        bodyGO = Instantiate(prefab, transform, false);
-        bodyGO.name = "TutorBody";
-        bodyGO.transform.localPosition = Vector3.zero;
-        // Mei's file is Z-up: tip upright (pitch -90 first), then face forward.
-        bodyGO.transform.localRotation = Quaternion.Euler(0, 180f, 0) * Quaternion.Euler(-90f, 0, 0);
-        bodyGO.transform.localScale = Vector3.one;
-        headGO = bodyGO; // whole-body nod preserves the old animation code
-        armL = null; armR = null; // FBX brings its own arms
+        // Mei at 1.699m ≈ 1.7m, scale 1.) Missing/broken FBX (e.g. Git LFS model
+        // never pulled → Resources.Load returns null, and Instantiate(null)
+        // throws ArgumentException) falls back to the procedural tutor so the
+        // classroom is never left without its teacher.
+        GameObject prefab = null;
+        try { prefab = Resources.Load<GameObject>("Models/Humans/human2"); }
+        catch (System.Exception e)
+        {
+            Debug.LogWarning("[Tutor] Load failed for human2: " + e.Message);
+        }
+        bool prefabUsable = prefab != null && prefab.GetComponentInChildren<Renderer>() != null;
+        if (prefabUsable)
+        {
+            try
+            {
+                bodyGO = Instantiate(prefab, transform, false);
+                bodyGO.name = "TutorBody";
+                bodyGO.transform.localPosition = Vector3.zero;
+                // Mei's file is Z-up: tip upright (pitch -90 first), then face forward.
+                tutorHeadBaseRot = Quaternion.Euler(0, 180f, 0) * Quaternion.Euler(-90f, 0, 0);
+                bodyGO.transform.localRotation = tutorHeadBaseRot;
+                bodyGO.transform.localScale = Vector3.one;
+                tutorBodyBasePos = Vector3.zero;
+                tutorHeadBaseScale = Vector3.one;
+                tutorProcedural = false;
+                headGO = bodyGO; // whole-body nod preserves the old animation code
+                armL = null; armR = null; // FBX brings its own arms
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogWarning("[Tutor] Instantiate failed for human2: " + e.Message + " — using fallback.");
+                if (bodyGO != null) Destroy(bodyGO);
+                bodyGO = null;
+                prefabUsable = false;
+            }
+        }
+        if (!prefabUsable)
+        {
+            Debug.LogWarning("[Tutor] human2 FBX missing — run `git lfs pull`; procedural fallback will be used.");
+            BuildProceduralBody();
+        }
 
         // Name tag floating above head
         var tag = new GameObject("NameTag");
         tag.transform.SetParent(transform, false);
-        tag.transform.localPosition = new Vector3(0, 2.05f, 0);
+        tag.transform.localPosition = new Vector3(0, tutorProcedural ? 2.35f : 2.05f, 0);
         var tm = tag.AddComponent<TextMesh>();
         tm.text = tutorName;
         tm.fontSize = 48;
@@ -76,6 +113,72 @@ public class TutorController : MonoBehaviour
         tm.anchor = TextAnchor.MiddleCenter;
         tm.color = Color.white;
         tm.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+    }
+
+    // Procedural low-poly fallback: capsule body + legs + head + glasses + arms
+    // + pointer stick. Needs no external assets.
+    void BuildProceduralBody()
+    {
+        tutorProcedural = true;
+        Material skin = new Material(Shader.Find("Standard")) { color = new Color(0.96f, 0.78f, 0.62f) };
+        Material shirt = new Material(Shader.Find("Standard")) { color = new Color(0.15f, 0.45f, 0.95f) };
+        Material pants = new Material(Shader.Find("Standard")) { color = new Color(0.12f, 0.14f, 0.2f) };
+
+        bodyGO = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+        bodyGO.name = "TutorBody";
+        bodyGO.transform.SetParent(transform, false);
+        tutorBodyBasePos = new Vector3(0, 0.95f, 0);
+        bodyGO.transform.localPosition = tutorBodyBasePos;
+        bodyGO.transform.localScale = new Vector3(0.55f, 0.9f, 0.55f);
+        bodyGO.GetComponent<Renderer>().material = shirt;
+
+        GameObject legs = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+        legs.name = "TutorLegs";
+        legs.transform.SetParent(transform, false);
+        legs.transform.localPosition = new Vector3(0, 0.3f, 0);
+        legs.transform.localScale = new Vector3(0.32f, 0.6f, 0.32f);
+        legs.GetComponent<Renderer>().material = pants;
+
+        headGO = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        headGO.name = "TutorHead";
+        headGO.transform.SetParent(transform, false);
+        headGO.transform.localPosition = new Vector3(0, 1.85f, 0);
+        tutorHeadBaseScale = Vector3.one * 0.42f;
+        headGO.transform.localScale = tutorHeadBaseScale;
+        headGO.GetComponent<Renderer>().material = skin;
+        tutorHeadBaseRot = Quaternion.identity;
+
+        for (int i = -1; i <= 1; i += 2)
+        {
+            var g = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            g.transform.SetParent(headGO.transform, false);
+            g.transform.localPosition = new Vector3(0.28f * i, 0.08f, 0.85f);
+            g.transform.localScale = new Vector3(0.32f, 0.2f, 0.1f);
+            g.GetComponent<Renderer>().material = new Material(Shader.Find("Standard")) { color = Color.black };
+        }
+
+        armL = MakeArm(new Vector3(-0.42f, 1.25f, 0), shirt, true);
+        armR = MakeArm(new Vector3(0.42f, 1.25f, 0), shirt, false);
+
+        var stick = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+        stick.name = "Pointer";
+        stick.transform.SetParent(armR.transform, false);
+        stick.transform.localPosition = new Vector3(0, -0.55f, 0.15f);
+        stick.transform.localRotation = Quaternion.Euler(70, 0, 0);
+        stick.transform.localScale = new Vector3(0.06f, 0.7f, 0.06f);
+        stick.GetComponent<Renderer>().material = new Material(Shader.Find("Standard")) { color = new Color(1f, 0.85f, 0.3f) };
+    }
+
+    GameObject MakeArm(Vector3 pos, Material m, bool left)
+    {
+        var arm = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+        arm.name = left ? "ArmL" : "ArmR";
+        arm.transform.SetParent(transform, false);
+        arm.transform.localPosition = pos;
+        arm.transform.localScale = new Vector3(0.18f, 0.55f, 0.18f);
+        arm.transform.localRotation = Quaternion.Euler(0, 0, left ? -160 : 160);
+        arm.GetComponent<Renderer>().material = m;
+        return arm;
     }
 
     void BuildBubble()
@@ -116,14 +219,14 @@ public class TutorController : MonoBehaviour
     void Update()
     {
         t += Time.deltaTime;
-        // Idle / walk bob (bigger bounce + sway while walking)
+        // Idle / walk bob (bigger bounce + sway while walking). Base pose comes
+        // from the build step so both FBX (floor root) and fallback animate right.
         float bobAmp = walking ? 0.035f : 0.02f;
         float bobFreq = walking ? 7f : 2f;
-        if (bodyGO) bodyGO.transform.localPosition = new Vector3(
+        if (bodyGO) bodyGO.transform.localPosition = tutorBodyBasePos + new Vector3(
             walking ? Mathf.Sin(t * bobFreq * 0.5f) * 0.025f : 0f,
-            Mathf.Sin(t * bobFreq) * bobAmp, 0); // FBX root stands on the floor
-        if (headGO) headGO.transform.localRotation =
-            (Quaternion.Euler(0, 180f, 0) * Quaternion.Euler(-90f, 0, 0))
+            Mathf.Sin(t * bobFreq) * bobAmp, 0);
+        if (headGO) headGO.transform.localRotation = tutorHeadBaseRot
             * Quaternion.Euler(0, Mathf.Sin(t * 0.7f) * 12f, 0);
         // Right arm points at board while explaining
         if (armR)
@@ -194,11 +297,11 @@ public class TutorController : MonoBehaviour
             if (armL) armL.transform.localRotation = Quaternion.Euler(Mathf.Sin(Time.time * 18f) * 35f, 0, -160);
             // little hop
             transform.localPosition += Vector3.zero; // keep anchored
-            if (headGO) headGO.transform.localScale = Vector3.one * (1f + Mathf.Sin(Time.time * 18f) * 0.02f);
+            if (headGO) headGO.transform.localScale = tutorHeadBaseScale * (1f + Mathf.Sin(Time.time * 18f) * 0.02f);
             yield return null;
         }
         if (armL) armL.transform.localRotation = Quaternion.Euler(0, 0, -160);
-        if (headGO) headGO.transform.localScale = Vector3.one;
+        if (headGO) headGO.transform.localScale = tutorHeadBaseScale;
     }
 
     public void ExplainCurrentTopic()
@@ -244,9 +347,15 @@ public class TutorController : MonoBehaviour
     {
         if (bubbleGO && bubbleGO.activeSelf && Camera.main)
         {
-            // +Z (readable face) toward the camera
-            bubbleGO.transform.rotation = Quaternion.LookRotation(
-                Camera.main.transform.position - bubbleGO.transform.position);
+            // Billboard the bubble toward the camera. Per Unity docs,
+            // LookRotation logs/ asserts on a zero forward vector, so guard it
+            // (camera exactly at the bubble position) before calling.
+            Vector3 toCam = Camera.main.transform.position - bubbleGO.transform.position;
+            if (toCam.sqrMagnitude > 1e-6f)
+            {
+                // +Z (readable face) toward the camera
+                bubbleGO.transform.rotation = Quaternion.LookRotation(toCam);
+            }
         }
     }
 }
