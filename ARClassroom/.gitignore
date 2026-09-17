@@ -30,6 +30,18 @@ sysinfo.txt
 *.unitypackage
 *.app
 crashlytics-build.properties
+.idea/
+
+# macOS junk
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+
+# Unity crash reports / dumps
+mono_crash*.json
+mono_crash*.blob
+*.stackdump
 
 # Asset meta files must ALWAYS be committed (except for ignored folders)
 /[Aa]ssets/Plugins/Editor/JetBrains*
