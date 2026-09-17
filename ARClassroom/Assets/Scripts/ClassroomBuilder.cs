@@ -20,8 +20,33 @@ public class ClassroomBuilder : MonoBehaviour
     static readonly string[] Names = new string[]
         { "Aarav", "Mia", "Leo", "Zara", "Kabir", "Nina", "Arjun", "Sara", "Dev" };
 
+    // Realistic characters (downloaded FBX in Assets/Resources/Models/Humans).
+    // human1 has no mesh (animation file only): tutor uses human2 (Mei, 1.699m).
+    // Students cycle human3 (Marina, 1.753m), human4 (man in black), human5 (boy, 2.647m).
+    // Scales convert each file to a ~1.5m student. Yaws face each model at the
+    // board; pitched=true tips Z-up files upright (pitch -90 about X first).
+    // If a model faces backwards in Play, flip its yaw 180 <-> 0.
+    GameObject[] studentBodyPrefabs;
+    readonly float[] studentBodyScales = new float[] { 0.856f, 0.092f, 0.567f };
+    readonly float[] studentBodyYaws = new float[] { 180f, 180f, 0f };
+    readonly bool[] studentBodyPitched = new bool[] { true, true, false };
+    readonly string[] studentBodyPaths = new string[] { "Models/Humans/human3", "Models/Humans/human4", "Models/Humans/human5" };
+
+    // Realistic furniture (Kenney FBX in Assets/Resources/Models/Kenney)
+    GameObject deskPrefab;
+    GameObject chairPrefab;
+    GameObject laptopPrefab;
+
     void Awake()
     {
+        studentBodyPrefabs = new GameObject[studentBodyPaths.Length];
+        for (int i = 0; i < studentBodyPaths.Length; i++)
+            studentBodyPrefabs[i] = Resources.Load<GameObject>(studentBodyPaths[i]);
+        deskPrefab = Resources.Load<GameObject>("Models/Kenney/desk");
+        chairPrefab = Resources.Load<GameObject>("Models/Kenney/chair");
+        laptopPrefab = Resources.Load<GameObject>("Models/Kenney/laptop");
+        if (deskPrefab == null || chairPrefab == null || laptopPrefab == null)
+            Debug.LogError("[Classroom] Missing Kenney FBX — check Assets/Resources/Models/Kenney.");
         // Regenerate from scratch: clear anything generated earlier (e.g. by the
         // Setup menu in edit mode and saved into the scene) so Play never stacks
         // duplicates on top of saved content.
@@ -197,73 +222,67 @@ public class ClassroomBuilder : MonoBehaviour
     void BuildDesksAndStudents()
     {
         Students = new StudentController[rows * cols];
-        Material deskMat = Mat(new Color(0.72f, 0.55f, 0.36f));
-        Material chairMat = Mat(new Color(0.2f, 0.22f, 0.3f));
 
         int idx = 0;
         for (int r = 0; r < rows; r++)
         {
             for (int c = 0; c < cols; c++)
             {
+                // Real furniture is bigger than the old slabs: rows start at z=0
+                // with 1.3m spacing so back-row chair backs stay inside the wall.
                 float x = (c - (cols - 1) / 2f) * 1.7f;
-                float z = 0.2f + r * 1.35f;
+                float z = r * 1.3f;
                 bool empty = System.Array.IndexOf(emptySeats, idx) >= 0;
 
-                // Desk
-                var desk = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                // Desk — Kenney FBX, scale 0.2 → 1.45m wide, top at 0.77m.
+                // (File origin at front-right-bottom corner, hence the offsets.)
+                var desk = Instantiate(deskPrefab, transform, false);
                 desk.name = $"Desk_{r}_{c}";
-                desk.transform.SetParent(transform, false);
-                desk.transform.localPosition = new Vector3(x, 0.72f, z);
-                desk.transform.localScale = new Vector3(1.1f, 0.08f, 0.7f);
-                desk.GetComponent<Renderer>().material = deskMat;
+                desk.transform.localPosition = new Vector3(x + 0.715f, 0f, z - 0.37f);
+                desk.transform.localRotation = Quaternion.identity;
+                desk.transform.localScale = Vector3.one * 0.2f;
 
-                // Desk legs
-                for (int lx = -1; lx <= 1; lx += 2)
-                    for (int lz = -1; lz <= 1; lz += 2)
-                    {
-                        var leg = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                        leg.transform.SetParent(transform, false);
-                        leg.transform.localPosition = new Vector3(x + lx * 0.48f, 0.36f, z + lz * 0.28f);
-                        leg.transform.localScale = new Vector3(0.06f, 0.72f, 0.06f);
-                        leg.GetComponent<Renderer>().material = chairMat;
-                    }
+                // Chair — Kenney FBX, scale 0.2 → seat at ~0.44m, backrest faces +Z
+                // (student side). Students face the board (-Z).
+                var chair = Instantiate(chairPrefab, transform, false);
+                chair.name = $"Chair_{r}_{c}";
+                chair.transform.localPosition = new Vector3(x + 0.2f, 0f, z + 0.45f);
+                chair.transform.localRotation = Quaternion.identity;
+                chair.transform.localScale = Vector3.one * 0.2f;
 
-                // Chair (far side of desk from the board — students face the board)
-                var chair = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                chair.transform.SetParent(transform, false);
-                chair.transform.localPosition = new Vector3(x, 0.45f, z + 0.65f);
-                chair.transform.localScale = new Vector3(0.5f, 0.08f, 0.5f);
-                chair.GetComponent<Renderer>().material = empty
-                    ? Mat(new Color(0.5f, 0.5f, 0.55f, 0.5f))
-                    : chairMat;
-                var back = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                back.transform.SetParent(transform, false);
-                back.transform.localPosition = new Vector3(x, 0.85f, z + 0.88f);
-                back.transform.localScale = new Vector3(0.5f, 0.6f, 0.07f);
-                back.GetComponent<Renderer>().material = chair.transform.GetComponent<Renderer>().material;
+                // Laptop on every desk — Kenney FBX, screen faces the student (+Z).
+                var lap = Instantiate(laptopPrefab, transform, false);
+                lap.name = $"Laptop_{r}_{c}";
+                lap.transform.localPosition = new Vector3(x - 0.24f, 0.77f, z + 0.27f);
+                lap.transform.localRotation = Quaternion.Euler(0, 180f, 0);
+                lap.transform.localScale = Vector3.one * 0.18f;
 
-                // Student root (clickable), rotated to face the board (-Z)
+                // Student root (clickable), rotated to face the board (-Z).
+                // Sitting: hips rest on the ~0.45m seat, so the body origin (feet)
+                // sits 0.3m below the floor — legs stay hidden under the desk.
                 var sgo = new GameObject($"Student_{Names[idx]}");
                 sgo.transform.SetParent(transform, false);
-                sgo.transform.localPosition = new Vector3(x, 0, z + 0.35f);
+                sgo.transform.localPosition = new Vector3(x, -0.3f, z + 0.55f);
                 sgo.transform.localRotation = Quaternion.Euler(0, 180f, 0);
                 // Big invisible hitbox so tapping is easy (esp. on phones)
                 var hit = sgo.AddComponent<BoxCollider>();
                 hit.size = new Vector3(1.1f, 2f, 1.4f);
                 hit.center = new Vector3(0, 1f, 0);
                 var sc = sgo.AddComponent<StudentController>();
-                sc.Setup(Names[idx], idx, empty);
-                Students[idx] = sc;
-
-                // Laptop for empty seats too (lid closed look = flat dark slab on desk)
-                if (empty)
+                GameObject body = null;
+                float bodyScale = 1f;
+                float bodyYaw = 180f;
+                bool bodyNeedsPitch = true;
+                if (!empty && studentBodyPrefabs != null && studentBodyPrefabs.Length > 0)
                 {
-                    var slab = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                    slab.transform.SetParent(transform, false);
-                    slab.transform.localPosition = new Vector3(x, 0.78f, z + 0.05f);
-                    slab.transform.localScale = new Vector3(0.5f, 0.03f, 0.34f);
-                    slab.GetComponent<Renderer>().material = Mat(new Color(0.25f, 0.26f, 0.3f));
+                    int pick = idx % studentBodyPrefabs.Length;
+                    body = studentBodyPrefabs[pick];
+                    bodyScale = studentBodyScales[pick % studentBodyScales.Length];
+                    bodyYaw = studentBodyYaws[pick % studentBodyYaws.Length];
+                    bodyNeedsPitch = studentBodyPitched[pick % studentBodyPitched.Length];
                 }
+                sc.Setup(Names[idx], idx, empty, body, bodyScale, bodyYaw, bodyNeedsPitch);
+                Students[idx] = sc;
 
                 idx++;
             }
