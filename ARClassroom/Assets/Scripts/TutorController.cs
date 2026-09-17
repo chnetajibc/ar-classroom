@@ -1,0 +1,296 @@
+using System.Collections;
+using UnityEngine;
+
+/// <summary>
+/// Procedural low-poly tutor standing by the board.
+/// Idle bob, wave on click, point-at-board while explaining.
+/// Speech bubble = world-space canvas with UI.Text (no TMP/font asset needed).
+/// </summary>
+public class TutorController : MonoBehaviour
+{
+    public string tutorName = "Prof. Ada — DSA Tutor";
+
+    [Header("Patrol — walks the front lane, pauses at each spot to teach")]
+    public Vector3[] patrolPoints = new Vector3[]
+    {
+        new Vector3(2.9f, 0, -1.5f),
+        new Vector3(0.2f, 0, -1.0f),
+        new Vector3(-2.4f, 0, -1.5f),
+        new Vector3(0.2f, 0, -1.0f),
+    };
+    public float walkSpeed = 0.7f;
+    public float pauseSeconds = 3f;
+    int wpIndex = 1;
+    float pauseUntil = 0f;
+    bool walking = true;
+    int lineIndex = 0;
+    readonly string[] patrolLines = new string[]
+    {
+        "Arrays: O(1) lookup!",
+        "Follow the pointer!",
+        "Questions? Tap me!",
+        "Big-O first, code later!",
+    };
+
+    GameObject bodyGO;
+    GameObject headGO;
+    GameObject armL, armR;
+    GameObject bubbleGO;
+    UnityEngine.UI.Text bubbleText;
+    BoardController board;
+    float t;
+    bool explaining;
+    Vector3 armRBaseRot = new Vector3(0, 0, 160);
+
+    void Awake()
+    {
+        BuildBody();
+        BuildBubble();
+    }
+
+    public void BindBoard(BoardController b) { board = b; }
+
+    void BuildBody()
+    {
+        // Materials
+        Material skin = new Material(Shader.Find("Standard")) { color = new Color(0.96f, 0.78f, 0.62f) };
+        Material shirt = new Material(Shader.Find("Standard")) { color = new Color(0.15f, 0.45f, 0.95f) };
+        Material pants = new Material(Shader.Find("Standard")) { color = new Color(0.12f, 0.14f, 0.2f) };
+
+        bodyGO = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+        bodyGO.name = "TutorBody";
+        bodyGO.transform.SetParent(transform, false);
+        bodyGO.transform.localPosition = new Vector3(0, 0.95f, 0);
+        bodyGO.transform.localScale = new Vector3(0.55f, 0.9f, 0.55f);
+        bodyGO.GetComponent<Renderer>().material = shirt;
+
+        GameObject legs = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+        legs.transform.SetParent(transform, false);
+        legs.transform.localPosition = new Vector3(0, 0.3f, 0);
+        legs.transform.localScale = new Vector3(0.32f, 0.6f, 0.32f);
+        legs.GetComponent<Renderer>().material = pants;
+
+        headGO = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        headGO.name = "TutorHead";
+        headGO.transform.SetParent(transform, false);
+        headGO.transform.localPosition = new Vector3(0, 1.85f, 0);
+        headGO.transform.localScale = Vector3.one * 0.42f;
+        headGO.GetComponent<Renderer>().material = skin;
+
+        // Glasses (two small dark boxes) — cute + readable as "teacher"
+        for (int i = -1; i <= 1; i += 2)
+        {
+            var g = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            g.transform.SetParent(headGO.transform, false);
+            g.transform.localPosition = new Vector3(0.28f * i, 0.08f, 0.85f);
+            g.transform.localScale = new Vector3(0.32f, 0.2f, 0.1f);
+            g.GetComponent<Renderer>().material = new Material(Shader.Find("Standard")) { color = Color.black };
+        }
+
+        // Arms
+        armL = MakeArm(new Vector3(-0.42f, 1.25f, 0), shirt, true);
+        armR = MakeArm(new Vector3(0.42f, 1.25f, 0), shirt, false);
+
+        // Pointer stick in right hand
+        var stick = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+        stick.transform.SetParent(armR.transform, false);
+        stick.transform.localPosition = new Vector3(0, -0.55f, 0.15f);
+        stick.transform.localRotation = Quaternion.Euler(70, 0, 0);
+        stick.transform.localScale = new Vector3(0.06f, 0.7f, 0.06f);
+        stick.GetComponent<Renderer>().material = new Material(Shader.Find("Standard")) { color = new Color(1f, 0.85f, 0.3f) };
+
+        // Name tag floating above head
+        var tag = new GameObject("NameTag");
+        tag.transform.SetParent(transform, false);
+        tag.transform.localPosition = new Vector3(0, 2.35f, 0);
+        var tm = tag.AddComponent<TextMesh>();
+        tm.text = tutorName;
+        tm.fontSize = 48;
+        tm.characterSize = 0.012f;
+        tm.anchor = TextAnchor.MiddleCenter;
+        tm.color = Color.white;
+        tm.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+    }
+
+    GameObject MakeArm(Vector3 pos, Material m, bool left)
+    {
+        var arm = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+        arm.name = left ? "ArmL" : "ArmR";
+        arm.transform.SetParent(transform, false);
+        arm.transform.localPosition = pos;
+        arm.transform.localScale = new Vector3(0.18f, 0.55f, 0.18f);
+        arm.transform.localRotation = Quaternion.Euler(0, 0, left ? -160 : 160);
+        arm.GetComponent<Renderer>().material = m;
+        return arm;
+    }
+
+    void BuildBubble()
+    {
+        bubbleGO = new GameObject("SpeechBubble");
+        bubbleGO.transform.SetParent(transform, false);
+        bubbleGO.transform.localPosition = new Vector3(0, 2.85f, 0);
+        var canvas = bubbleGO.AddComponent<Canvas>();
+        canvas.renderMode = RenderMode.WorldSpace;
+        var rt = canvas.GetComponent<RectTransform>();
+        rt.sizeDelta = new Vector2(460, 150);
+
+        var bg = new GameObject("BubbleBG");
+        bg.transform.SetParent(bubbleGO.transform, false);
+        var img = bg.AddComponent<UnityEngine.UI.Image>();
+        img.color = new Color(1f, 1f, 1f, 0.95f);
+        var brt = bg.GetComponent<RectTransform>();
+        brt.anchorMin = Vector2.zero; brt.anchorMax = Vector2.one;
+        brt.offsetMin = Vector2.zero; brt.offsetMax = Vector2.zero;
+
+        var tgo = new GameObject("BubbleText");
+        tgo.transform.SetParent(bubbleGO.transform, false);
+        bubbleText = tgo.AddComponent<UnityEngine.UI.Text>();
+        bubbleText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        bubbleText.fontSize = 26;
+        bubbleText.color = Color.black;
+        bubbleText.alignment = TextAnchor.MiddleCenter;
+        bubbleText.horizontalOverflow = HorizontalWrapMode.Wrap;
+        bubbleText.verticalOverflow = VerticalWrapMode.Overflow;
+        var trt = tgo.GetComponent<RectTransform>();
+        trt.anchorMin = Vector2.zero; trt.anchorMax = Vector2.one;
+        trt.offsetMin = new Vector2(14, 10); trt.offsetMax = new Vector2(-14, -10);
+
+        bubbleGO.transform.localScale = Vector3.one * 0.004f;
+        bubbleGO.SetActive(false);
+    }
+
+    void Update()
+    {
+        t += Time.deltaTime;
+        // Idle / walk bob (bigger bounce + sway while walking)
+        float bobAmp = walking ? 0.035f : 0.02f;
+        float bobFreq = walking ? 7f : 2f;
+        if (bodyGO) bodyGO.transform.localPosition = new Vector3(
+            walking ? Mathf.Sin(t * bobFreq * 0.5f) * 0.025f : 0f,
+            0.95f + Mathf.Sin(t * bobFreq) * bobAmp, 0);
+        if (headGO) headGO.transform.localRotation = Quaternion.Euler(0, Mathf.Sin(t * 0.7f) * 12f, 0);
+        // Right arm points at board while explaining
+        if (armR)
+        {
+            float target = explaining ? 55f : 160f + Mathf.Sin(t * 1.5f) * 8f;
+            var e = armR.transform.localRotation.eulerAngles;
+            e.z = Mathf.LerpAngle(e.z, target, Time.deltaTime * 4f);
+            armR.transform.localRotation = Quaternion.Euler(e);
+        }
+        // Face the camera-ish: keep upright, slowly face board->class
+        PatrolUpdate();
+    }
+
+    void PatrolUpdate()
+    {
+        if (patrolPoints == null || patrolPoints.Length == 0) return;
+        Vector3 target = patrolPoints[wpIndex];
+        Vector3 to = target - transform.localPosition;
+        to.y = 0f;
+        if (to.magnitude < 0.15f)
+        {
+            // Arrived: pause here and teach a line (once per stop)
+            if (walking)
+            {
+                walking = false;
+                pauseUntil = Time.time + pauseSeconds;
+                Speak(patrolLines[lineIndex % patrolLines.Length], pauseSeconds);
+                lineIndex++;
+            }
+            FaceYaw(0f); // face the class while teaching
+            if (Time.time >= pauseUntil)
+            {
+                walking = true;
+                wpIndex = (wpIndex + 1) % patrolPoints.Length;
+            }
+        }
+        else
+        {
+            walking = true;
+            Vector3 step = to.normalized * walkSpeed * Time.deltaTime;
+            if (step.magnitude > to.magnitude) step = to;
+            transform.localPosition += step;
+            FaceYaw(Mathf.Atan2(to.x, to.z) * Mathf.Rad2Deg);
+        }
+    }
+
+    void FaceYaw(float yaw)
+    {
+        var e = transform.localRotation.eulerAngles;
+        e.x = 0f; e.z = 0f;
+        e.y = Mathf.LerpAngle(e.y, yaw, Time.deltaTime * 5f);
+        transform.localRotation = Quaternion.Euler(e);
+    }
+
+    // Called by tap / UI button
+    public void OnTapped()
+    {
+        StopAllCoroutines();
+        StartCoroutine(CoWave());
+        ExplainCurrentTopic();
+    }
+
+    System.Collections.IEnumerator CoWave()
+    {
+        float end = Time.time + 1.2f;
+        while (Time.time < end)
+        {
+            if (armL) armL.transform.localRotation = Quaternion.Euler(Mathf.Sin(Time.time * 18f) * 35f, 0, -160);
+            // little hop
+            transform.localPosition += Vector3.zero; // keep anchored
+            headGO.transform.localScale = Vector3.one * (0.42f + Mathf.Sin(Time.time * 18f) * 0.015f);
+            yield return null;
+        }
+        if (armL) armL.transform.localRotation = Quaternion.Euler(0, 0, -160);
+        if (headGO) headGO.transform.localScale = Vector3.one * 0.42f;
+    }
+
+    public void ExplainCurrentTopic()
+    {
+        string msg = "Welcome to DSA class!";
+        if (board != null && board.CurrentTopic() != null)
+        {
+            var topic = board.CurrentTopic().title;
+            if (topic.Contains("ARRAY")) msg = "Arrays give O(1) lookup by index!";
+            else if (topic.Contains("LINKED")) msg = "Linked lists: O(1) insert at head!";
+            else if (topic.Contains("STACK")) msg = "Stack = LIFO, Queue = FIFO!";
+            else if (topic.Contains("BIG")) msg = "Always think Big-O before coding!";
+            else if (topic.Contains("BINARY")) msg = "BST: left < root < right!";
+        }
+        Speak(msg, 3.5f);
+        StopCoroutine("CoExplain");
+        StartCoroutine("CoExplain");
+    }
+
+    IEnumerator CoExplain()
+    {
+        explaining = true;
+        yield return new WaitForSeconds(3.5f);
+        explaining = false;
+    }
+
+    public void Speak(string msg, float seconds = 3f)
+    {
+        StopCoroutine("CoBubble");
+        StartCoroutine(CoBubble(msg, seconds));
+    }
+
+    IEnumerator CoBubble(string msg, float seconds)
+    {
+        bubbleGO.SetActive(true);
+        bubbleText.text = msg;
+        // Face bubble toward main camera
+        yield return new WaitForSeconds(seconds);
+        bubbleGO.SetActive(false);
+    }
+
+    void LateUpdate()
+    {
+        if (bubbleGO && bubbleGO.activeSelf && Camera.main)
+        {
+            // +Z (readable face) toward the camera
+            bubbleGO.transform.rotation = Quaternion.LookRotation(
+                Camera.main.transform.position - bubbleGO.transform.position);
+        }
+    }
+}

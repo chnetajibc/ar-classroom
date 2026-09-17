@@ -1,0 +1,164 @@
+using System;
+using UnityEngine;
+using UnityEngine.UI;
+
+/// <summary>
+/// DSA whiteboard. Renders topics on a World-Space canvas and notifies tutor.
+/// Attach to the Board GameObject created by ClassroomBuilder.
+/// </summary>
+public class BoardController : MonoBehaviour
+{
+    [Serializable]
+    public class DsaTopic
+    {
+        public string title;
+        [TextArea(3, 8)] public string body;
+        public string code;
+        public Color accent = new Color(0.2f, 0.9f, 0.6f);
+    }
+
+    public DsaTopic[] topics = new DsaTopic[]
+    {
+        new DsaTopic {
+            title = "1/5  ARRAYS  •  O(1) access",
+            body = "• Contiguous memory\n• arr[i] = base + i * size\n• Insert at end O(1), middle O(n)\n• Great for cache + index lookup",
+            code = "int[] a = {10,20,30};\n// read:  a[1] -> 20  O(1)\n// push:  O(1) / O(n) if resize",
+            accent = new Color(0.25f, 0.85f, 1f)
+        },
+        new DsaTopic {
+            title = "2/5  LINKED LIST  •  O(1) insert",
+            body = "• Nodes + pointers, not contiguous\n• Insert/delete at head O(1)\n• Search O(n) — must walk\n• No resize cost like arrays",
+            code = "class Node { int val; Node next; }\n// head -> [10] -> [20] -> null\n// insert head: O(1)",
+            accent = new Color(0.35f, 1f, 0.55f)
+        },
+        new DsaTopic {
+            title = "3/5  STACK & QUEUE",
+            body = "• Stack: LIFO — Push / Pop / Peek O(1)\n• Queue: FIFO — Enqueue / Dequeue O(1)\n• Undo, BFS, brackets, sliding window",
+            code = "Stack<int> s = new();\ns.Push(1); s.Pop();  // LIFO\nQueue<int> q = new();\nq.Enqueue(1); q.Dequeue(); // FIFO",
+            accent = new Color(1f, 0.8f, 0.3f)
+        },
+        new DsaTopic {
+            title = "4/5  BIG-O CHEAT SHEET",
+            body = "• O(1) < O(log n) < O(n) < O(n log n) < O(n²)\n• Binary search O(log n)\n• Two pointers saves a loop\n• Hash map trades space for time",
+            code = "// n = 1_000_000\n// O(n²)  ~ 31 years (bad!)\n// O(n log n) ~ 20M ops (good)",
+            accent = new Color(1f, 0.45f, 0.6f)
+        },
+        new DsaTopic {
+            title = "5/5  BINARY SEARCH TREE",
+            body = "• Left < Root < Right\n• Search / Insert avg O(log n)\n• Worst O(n) if unbalanced\n• AVL / Red-Black keep it balanced",
+            code = "      8\n    /   \\\n   3     10\n  / \\      \\\n 1   6      14\n// search(6): 8->3->6  O(log n)",
+            accent = new Color(0.7f, 0.6f, 1f)
+        },
+    };
+
+    public int currentIndex = 0;
+
+    Transform boardFace;
+    Text titleText;
+    Text bodyText;
+    Text codeText;
+    Image accentBar;
+    Text hintText;
+
+    public event Action<int> OnTopicChanged;
+
+    void Awake()
+    {
+        BuildBoardVisuals();
+        ShowTopic(0);
+    }
+
+    void BuildBoardVisuals()
+    {
+        // Board frame already exists as parent; add face canvas
+        boardFace = transform.Find("BoardCanvas");
+        if (boardFace != null) return;
+
+        GameObject canvasGO = new GameObject("BoardCanvas");
+        canvasGO.transform.SetParent(transform, false);
+        // Board is 4.4 wide x 2.4 tall, positioned at front wall
+        canvasGO.transform.localPosition = new Vector3(0, 0, 0.06f);
+        canvasGO.transform.localRotation = Quaternion.identity;
+        canvasGO.transform.localScale = Vector3.one;
+
+        Canvas canvas = canvasGO.AddComponent<Canvas>();
+        canvas.renderMode = RenderMode.WorldSpace;
+        // 880 x 480 px over 4.4 x 2.4 m => 200 px per meter
+        canvas.GetComponent<RectTransform>().sizeDelta = new Vector2(880, 480);
+
+        // Dark background panel
+        GameObject bg = new GameObject("BG");
+        bg.transform.SetParent(canvasGO.transform, false);
+        Image bgImg = bg.AddComponent<Image>();
+        bgImg.color = new Color(0.07f, 0.11f, 0.14f, 1f);
+        RectTransform bgRt = bg.GetComponent<RectTransform>();
+        bgRt.anchorMin = Vector2.zero; bgRt.anchorMax = Vector2.one;
+        bgRt.offsetMin = Vector2.zero; bgRt.offsetMax = Vector2.zero;
+
+        accentBar = CreateUIBar(canvasGO.transform, new Color(0.25f, 0.85f, 1f));
+
+        titleText = CreateUIText(canvasGO.transform, "Title",
+            new Rect(20, 10, 840, 60), 34, FontStyle.Bold, TextAnchor.UpperLeft, Color.white);
+        bodyText = CreateUIText(canvasGO.transform, "Body",
+            new Rect(20, 80, 500, 380), 24, FontStyle.Normal, TextAnchor.UpperLeft, new Color(0.9f, 0.95f, 1f));
+        codeText = CreateUIText(canvasGO.transform, "Code",
+            new Rect(540, 80, 320, 380), 21, FontStyle.Normal, TextAnchor.UpperLeft, new Color(0.6f, 1f, 0.75f));
+        hintText = CreateUIText(canvasGO.transform, "Hint",
+            new Rect(20, 430, 840, 40), 18, FontStyle.Italic, TextAnchor.LowerLeft,
+            new Color(1f, 1f, 1f, 0.55f));
+        hintText.text = "Click / tap the board  •  Next topic button works too";
+    }
+
+    Image CreateUIBar(Transform parent, Color c)
+    {
+        GameObject go = new GameObject("Accent");
+        go.transform.SetParent(parent, false);
+        Image img = go.AddComponent<Image>();
+        img.color = c;
+        RectTransform rt = go.GetComponent<RectTransform>();
+        rt.anchorMin = new Vector2(0, 1); rt.anchorMax = new Vector2(1, 1);
+        rt.offsetMin = new Vector2(0, -72); rt.offsetMax = new Vector2(0, -64);
+        return img;
+    }
+
+    Text CreateUIText(Transform parent, string name, Rect rect, int size, FontStyle style, TextAnchor anchor, Color color)
+    {
+        GameObject go = new GameObject(name);
+        go.transform.SetParent(parent, false);
+        Text t = go.AddComponent<Text>();
+        t.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        if (t.font == null) t.font = Font.CreateDynamicFontFromOSFont("Arial", size);
+        t.fontSize = size;
+        t.fontStyle = style;
+        t.alignment = anchor;
+        t.color = color;
+        t.horizontalOverflow = HorizontalWrapMode.Wrap;
+        t.verticalOverflow = VerticalWrapMode.Overflow;
+        RectTransform rt = go.GetComponent<RectTransform>();
+        // World-space canvas: position manually via offsets
+        rt.anchorMin = new Vector2(0, 1); rt.anchorMax = new Vector2(0, 1);
+        rt.pivot = new Vector2(0, 1);
+        rt.offsetMin = new Vector2(rect.x - 440, -rect.y - rect.height + 240);
+        rt.offsetMax = new Vector2(rect.x - 440 + rect.width, -rect.y + 240);
+        rt.localScale = Vector3.one * 0.005f; // 200px per meter mapping tweak
+        // Fix: world canvas scale — use parent scale instead
+        rt.localScale = Vector3.one;
+        return t;
+    }
+
+    public void ShowTopic(int i)
+    {
+        if (topics == null || topics.Length == 0) return;
+        currentIndex = ((i % topics.Length) + topics.Length) % topics.Length;
+        var t = topics[currentIndex];
+        if (titleText) titleText.text = t.title;
+        if (bodyText) bodyText.text = t.body;
+        if (codeText) codeText.text = t.code;
+        if (accentBar) accentBar.color = t.accent;
+        OnTopicChanged?.Invoke(currentIndex);
+    }
+
+    public void NextTopic() { ShowTopic(currentIndex + 1); }
+    public void PrevTopic() { ShowTopic(currentIndex - 1); }
+    public DsaTopic CurrentTopic() { return topics[currentIndex]; }
+}
