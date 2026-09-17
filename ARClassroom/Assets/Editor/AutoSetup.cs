@@ -69,7 +69,13 @@ public static class AutoSetup
             var go = new GameObject("Main Camera");
             go.tag = "MainCamera";
             cam = go.AddComponent<Camera>();
-            cam.transform.position = new Vector3(0, 1.6f, 0);
+            cam.transform.position = new Vector3(-3.2f, 2.6f, -1.8f);
+            cam.transform.rotation = Quaternion.Euler(23.6f, 56.7f, 0f);
+            go.AddComponent<CameraCorners>();
+        }
+        else if (cam.GetComponent<CameraCorners>() == null)
+        {
+            cam.gameObject.AddComponent<CameraCorners>();
         }
 
         if (Object.FindFirstObjectByType<ClassroomBuilder>() == null)

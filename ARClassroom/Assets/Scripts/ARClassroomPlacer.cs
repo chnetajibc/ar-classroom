@@ -5,8 +5,8 @@ using UnityEngine;
 /// - REAL AR (phone): if AR Foundation plane tracking is present, tap a
 ///   detected plane to place the classroom. Uses reflection so the project
 ///   still compiles/runs in the Editor with zero AR packages installed.
-/// - EDITOR / DESKTOP (click Play on Mac): no planes exist, so after 1 second
-///   the classroom auto-spawns 2.2m in front of the camera. Everything works
+/// - EDITOR / DESKTOP (click Play on Mac): no planes exist, so the room is
+///   staged at the origin for the fixed scene camera. Everything works
 ///   with mouse: click board/tutor/students, drag to orbit, wheel to zoom.
 /// </summary>
 public class ARClassroomPlacer : MonoBehaviour

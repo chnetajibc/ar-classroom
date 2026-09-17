@@ -18,7 +18,8 @@ ARClassroom/
   Assets/Scenes/ARClassroom.unity   ← open this, press Play
   Assets/Scripts/
     ClassroomBuilder.cs    classroom, desks, 9 seats (6 students + 3 empty), laptops, board wall
-    BoardController.cs     5 DSA topics: Arrays, Linked List, Stack/Queue, Big-O, BST
+    BoardController.cs     5 chalkboard DSA topics (chalk-on-slate look, tray + chalk + eraser)
+    CameraCorners.cs       4 CCTV corner views, front-left default, 📷 View button cycles
     TutorController.cs     Prof. Ada: patrols the front lane, pauses to teach, wave, point-at-board, speech bubble
     StudentController.cs   typing animation, glowing laptop screens, name tags
     ARClassroomPlacer.cs   AR tap-to-place + Desktop auto-place fallback (why Play "just works")
@@ -28,7 +29,8 @@ ARClassroom/
   Packages/manifest.json      AR Foundation 5.1.5 + ARCore + ARKit + XR Management
 ```
 
-**Scene contents:** floor + rug + front wall with banner, 4.8 m DSA board teaching 5 topics,
+**Scene contents:** floor + rug + 4 walls with banner, DSA posters and motivational quotes,
+chalk blackboard with tray + chalk + eraser teaching 5 DSA topics,
 3×3 desks = **9 seats, 6 occupied (each with an open glowing laptop), 3 empty** (translucent chair + "— empty —" tag),
 tutor on a blue disc with pointer stick + name tag + speech bubble, directional light.
 
@@ -36,7 +38,8 @@ tutor on a blue disc with pointer stick + name tag + speech bubble, directional 
 - Click/tap **board** → next DSA topic (or use `Next Topic ▶` button, `N` key)
 - Click/tap **tutor** → wave + explains current topic in speech bubble
 - Click/tap **student** → highlight (laptop glows yellow) + info popup + hop
-- Buttons: `◀ Topic`, `Next Topic ▶`, `🎓 Tutor Explains`, `⟳ Rotate`, `＋/－ Size`, `Reset`
+- Buttons: `◀ Topic`, `Next Topic ▶`, `🎓 Tutor Explains`, `⟳ Rotate`, `＋/－ Size`, `📷 View`, `Reset`
+- Camera starts at the front-left CCTV corner; `📷 View` cycles all 4 corners, `Reset` returns to corner 1
 - Desktop extras: **right-drag** orbits classroom, **mouse wheel** zooms, `R` resets placement
 
 ---
@@ -61,8 +64,8 @@ tutor on a blue disc with pointer stick + name tag + speech bubble, directional 
 
 1. Open scene `Assets/Scenes/ARClassroom.unity`.
 2. Press **▶ Play** at the top.
-3. After ~1 second the classroom **auto-spawns, staged at the origin**, framed by a
-   fixed front-left camera: tutor on the right, students across the middle.
+3. After ~1 second the classroom **auto-spawns, staged at the origin**, watched by the
+   default front-left CCTV camera (board left, tutor mid-right, students center).
 4. Try: click the **board** (topics cycle), click the **tutor** (she waves + explains), click any **student** (popup), use bottom-bar buttons.
 5. Press Play again to stop.
 

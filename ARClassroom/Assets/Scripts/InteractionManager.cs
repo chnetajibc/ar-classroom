@@ -24,6 +24,7 @@ public class InteractionManager : MonoBehaviour
         bool tapped = Input.GetMouseButtonDown(0) ||
                       (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began);
         if (!tapped) return;
+        if (Camera.main == null) return;
 
         // Ignore taps on UI buttons
         try
@@ -38,8 +39,7 @@ public class InteractionManager : MonoBehaviour
         catch { }
 
         Vector2 pos = Input.touchCount > 0 ? (Vector2)Input.GetTouch(0).position : (Vector2)Input.mousePosition;
-        Ray ray = Camera.main ? Camera.main.ScreenPointToRay(pos) : new Ray();
-        if (Camera.main == null) return;
+        Ray ray = Camera.main.ScreenPointToRay(pos);
 
         if (Physics.Raycast(ray, out RaycastHit hit, 100f))
         {

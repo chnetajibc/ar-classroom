@@ -168,6 +168,30 @@ public class ClassroomBuilder : MonoBehaviour
         col.isTrigger = false;
 
         Board = boardGO.AddComponent<BoardController>();
+
+        // Chalk tray + chalk sticks + eraser (parented to the board)
+        var tray = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        tray.name = "ChalkTray";
+        tray.transform.SetParent(boardGO.transform, false);
+        tray.transform.localPosition = new Vector3(0, -1.45f, 0.12f);
+        tray.transform.localScale = new Vector3(3f, 0.06f, 0.2f);
+        tray.GetComponent<Renderer>().material = Mat(new Color(0.4f, 0.28f, 0.16f));
+        for (int i = -1; i <= 1; i += 2)
+        {
+            var chalk = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            chalk.name = "Chalk";
+            chalk.transform.SetParent(boardGO.transform, false);
+            chalk.transform.localPosition = new Vector3(0.5f * i, -1.39f, 0.12f);
+            chalk.transform.localRotation = Quaternion.Euler(0, 0, 90f);
+            chalk.transform.localScale = new Vector3(0.035f, 0.22f, 0.035f);
+            chalk.GetComponent<Renderer>().material = Mat(Color.white);
+        }
+        var eraser = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        eraser.name = "Eraser";
+        eraser.transform.SetParent(boardGO.transform, false);
+        eraser.transform.localPosition = new Vector3(1.1f, -1.38f, 0.12f);
+        eraser.transform.localScale = new Vector3(0.3f, 0.09f, 0.13f);
+        eraser.GetComponent<Renderer>().material = Mat(new Color(0.15f, 0.15f, 0.18f));
     }
 
     void BuildDesksAndStudents()
