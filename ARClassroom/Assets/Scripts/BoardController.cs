@@ -86,23 +86,23 @@ public class BoardController : MonoBehaviour
         // 880 x 480 px over 4.4 x 2.4 m => 200 px per meter
         canvas.GetComponent<RectTransform>().sizeDelta = new Vector2(880, 480);
 
-        // Dark background panel
+        // Chalkboard face
         GameObject bg = new GameObject("BG");
         bg.transform.SetParent(canvasGO.transform, false);
         Image bgImg = bg.AddComponent<Image>();
-        bgImg.color = new Color(0.07f, 0.11f, 0.14f, 1f);
+        bgImg.color = new Color(0.10f, 0.14f, 0.13f, 1f); // slate-green chalkboard
         RectTransform bgRt = bg.GetComponent<RectTransform>();
         bgRt.anchorMin = Vector2.zero; bgRt.anchorMax = Vector2.one;
         bgRt.offsetMin = Vector2.zero; bgRt.offsetMax = Vector2.zero;
 
-        accentBar = CreateUIBar(canvasGO.transform, new Color(0.25f, 0.85f, 1f));
+        accentBar = CreateUIBar(canvasGO.transform, new Color(1f, 0.9f, 0.55f)); // chalk yellow
 
         titleText = CreateUIText(canvasGO.transform, "Title",
-            new Rect(20, 10, 840, 60), 34, FontStyle.Bold, TextAnchor.UpperLeft, Color.white);
+            new Rect(20, 10, 840, 60), 34, FontStyle.Bold, TextAnchor.UpperLeft, new Color(1f, 0.99f, 0.94f));
         bodyText = CreateUIText(canvasGO.transform, "Body",
-            new Rect(20, 80, 500, 380), 24, FontStyle.Normal, TextAnchor.UpperLeft, new Color(0.9f, 0.95f, 1f));
+            new Rect(20, 80, 500, 380), 24, FontStyle.Normal, TextAnchor.UpperLeft, new Color(0.93f, 0.93f, 0.88f));
         codeText = CreateUIText(canvasGO.transform, "Code",
-            new Rect(540, 80, 320, 380), 21, FontStyle.Normal, TextAnchor.UpperLeft, new Color(0.6f, 1f, 0.75f));
+            new Rect(540, 80, 320, 380), 21, FontStyle.Normal, TextAnchor.UpperLeft, new Color(1f, 0.9f, 0.55f));
         hintText = CreateUIText(canvasGO.transform, "Hint",
             new Rect(20, 430, 840, 40), 18, FontStyle.Italic, TextAnchor.LowerLeft,
             new Color(1f, 1f, 1f, 0.55f));

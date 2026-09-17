@@ -96,7 +96,8 @@ public class ClassroomUI : MonoBehaviour
         Button(bottom.transform, "⟳ Rotate", () => { var r = FindRoot(); if (r) r.Rotate(0, 25, 0); });
         Button(bottom.transform, "＋ Size", () => ScaleRoot(1.15f));
         Button(bottom.transform, "－ Size", () => ScaleRoot(1f / 1.15f));
-        Button(bottom.transform, "Reset", () => { var p = FindFirstObjectByType<ARClassroomPlacer>(); if (p) p.ResetPlacement(); });
+        Button(bottom.transform, "📷 View", () => { var cc = CameraCorners.Instance; if (cc) { cc.Next(); Toast("Camera: " + cc.CurrentName); } });
+        Button(bottom.transform, "Reset", () => { var p = FindFirstObjectByType<ARClassroomPlacer>(); if (p) p.ResetPlacement(); if (CameraCorners.Instance) CameraCorners.Instance.GoTo(0); });
 
         // Info popup (right side)
         infoPanel = Panel(canvasGO.transform, new Vector2(1, 0.5f), new Vector2(320, 170));
