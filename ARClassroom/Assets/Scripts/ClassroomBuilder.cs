@@ -261,57 +261,10 @@ public class ClassroomBuilder : MonoBehaviour
         rightWall.transform.localScale = new Vector3(0.15f, 3f, 8f);
         rightWall.GetComponent<Renderer>().material = Mat(new Color(0.85f, 0.86f, 0.9f));
 
-        // DSA posters on the side walls
-        MakePoster(new Vector3(-4.9f, 1.7f, 1.6f), 90f,
-            "BIG-O\nO(1) FAST\nO(n^2) SLOW", new Color(0.12f, 0.3f, 0.55f));
-        MakePoster(new Vector3(4.9f, 1.7f, 1.6f), -90f,
-            "ARRAYS O(1)\nLISTS O(n)\nMAPS O(1)", new Color(0.45f, 0.2f, 0.35f));
-
-        // Motivational quotes: back wall + front wall beside the board
-        MakePoster(new Vector3(-2.2f, 1.7f, 5.42f), 180f,
-            "CODE\nDEBUG\nREPEAT", new Color(0.1f, 0.45f, 0.35f));
-        MakePoster(new Vector3(2.2f, 1.7f, 5.42f), 180f,
-            "STAY\nCURIOUS", new Color(0.6f, 0.3f, 0.1f));
-        MakePoster(new Vector3(-3.0f, 1.7f, -2.42f), 0f,
-            "LEARN\nSOMETHING\nDAILY", new Color(0.2f, 0.35f, 0.65f));
-        MakePoster(new Vector3(3.0f, 1.7f, -2.42f), 0f,
-            "O(log n)\nMINDSET", new Color(0.5f, 0.15f, 0.3f));
-
-        // Side title banner
-        var banner = new GameObject("Banner");
-        banner.transform.SetParent(transform, false);
-        banner.transform.localPosition = new Vector3(0, 2.85f, -2.4f);
-        var tm = banner.AddComponent<TextMesh>();
-        tm.text = "AR CLASSROOM  •  DATA STRUCTURES & ALGORITHMS";
-        tm.fontSize = 52; tm.characterSize = 0.016f;
-        tm.anchor = TextAnchor.MiddleCenter; tm.color = new Color(0.1f, 0.2f, 0.5f);
-        tm.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-    }
-
-    void MakePoster(Vector3 pos, float yaw, string text, Color bg)
-    {
-        var poster = GameObject.CreatePrimitive(PrimitiveType.Quad);
-        poster.name = "Poster";
-        poster.transform.SetParent(transform, false);
-        poster.transform.localPosition = pos;
-        poster.transform.localRotation = Quaternion.Euler(0, yaw, 0);
-        poster.transform.localScale = new Vector3(2.4f, 1.5f, 1);
-        poster.GetComponent<Renderer>().material = Mat(bg);
-
-        var label = new GameObject("PosterText");
-        label.transform.SetParent(poster.transform, false);
-        label.transform.localPosition = new Vector3(0, 0, 0.01f);
-        label.transform.localRotation = Quaternion.identity;
-        // Counter-scale so text renders at true size regardless of poster scale
-        label.transform.localScale = new Vector3(1f / 2.4f, 1f / 1.5f, 1);
-        var tm = label.AddComponent<TextMesh>();
-        tm.text = text;
-        tm.fontSize = 48;
-        tm.characterSize = 0.008f;
-        tm.anchor = TextAnchor.MiddleCenter;
-        tm.alignment = TextAlignment.Center;
-        tm.color = Color.white;
-        tm.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        // Wall text was moved onto the blackboard (BoardController topics):
+        // walls stay clean for readability — all DSA posters + banner content
+        // now lives on the board's high-res World-Space Canvas (880x480 @
+        // 0.005 scale ≈ 200px/m) where text stays crisp. See BoardController.
     }
 
     void BuildBoard()

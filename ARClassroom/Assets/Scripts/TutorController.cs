@@ -317,6 +317,8 @@ public class TutorController : MonoBehaviour
             else if (topic.Contains("STACK")) msg = "Stack = LIFO, Queue = FIFO!";
             else if (topic.Contains("BIG")) msg = "Always think Big-O before coding!";
             else if (topic.Contains("BINARY")) msg = "BST: left < root < right!";
+            else if (topic.Contains("QUICK")) msg = "Quick ref: O(1) fast, O(n^2) slow!";
+            else if (topic.Contains("MOTTO") || topic.Contains("CLASSROOM")) msg = "Code, debug, repeat — stay curious!";
         }
         Speak(msg, 3.5f);
         StopCoroutine("CoExplain");
