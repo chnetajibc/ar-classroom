@@ -60,10 +60,13 @@ public class TutorController : MonoBehaviour
     {
         // Realistic tutor: downloaded FBX standing on the floor at the tutor root.
         // (human1 file has no mesh — animation data only — so tutor uses human2,
-        // Mei at 1.699m ≈ 1.7m, scale 1.) Missing/broken FBX (e.g. Git LFS model
-        // never pulled → Resources.Load returns null, and Instantiate(null)
-        // throws ArgumentException) falls back to the procedural tutor so the
-        // classroom is never left without its teacher.
+        // Mei at 1.699m ≈ 1.7m, scale 1.) Mei's file is Z-up: tip upright
+        // (pitch -90 first). Yaw 90 faces her toward the class from the
+        // tutor's front-right patrol spot — verified with headless renders
+        // (yaw 0 faced the east wall, 180/270 faced away).
+        // Missing/broken FBX (e.g. Git LFS model never pulled → Resources.Load
+        // returns null, and Instantiate(null) throws ArgumentException) falls
+        // back to the procedural tutor so the classroom is never without teacher.
         GameObject prefab = null;
         try { prefab = Resources.Load<GameObject>("Models/Humans/human2"); }
         catch (System.Exception e)
@@ -78,8 +81,7 @@ public class TutorController : MonoBehaviour
                 bodyGO = Instantiate(prefab, transform, false);
                 bodyGO.name = "TutorBody";
                 bodyGO.transform.localPosition = Vector3.zero;
-                // Mei's file is Z-up: tip upright (pitch -90 first), then face forward.
-                tutorHeadBaseRot = Quaternion.Euler(0, 180f, 0) * Quaternion.Euler(-90f, 0, 0);
+                tutorHeadBaseRot = Quaternion.Euler(0, 90f, 0) * Quaternion.Euler(-90f, 0, 0);
                 bodyGO.transform.localRotation = tutorHeadBaseRot;
                 bodyGO.transform.localScale = Vector3.one;
                 tutorBodyBasePos = Vector3.zero;

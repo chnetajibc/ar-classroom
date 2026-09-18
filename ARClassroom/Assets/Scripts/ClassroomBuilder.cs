@@ -27,13 +27,17 @@ public class ClassroomBuilder : MonoBehaviour
     // black, ~1.62m) and human5 (rigged boy, 2.691m) — never human2 (teacher).
     // Scales convert each file to a ~1.5m student (human4 was 0.092 by mistake,
     // which shrank it to a 15cm miniature — measured true length is ~1.62m).
-    // Yaws face each model at the board; pitched=true tips Z-up files upright
-    // (pitch -90 about X first). If a model faces backwards in Play, flip its
-    // yaw 180 <-> 0.
+    // Yaws face each model at the board; pitched=true tips Z-up files upright.
+    // Per-model pitch: human3 is Z-up flat (-90), human4 lies 27° nose-up in
+    // the file (PCA-measured axis) so -117 stands it vertical, human5 is Y-up
+    // already (no pitch). Yaws verified against headless renders: human3
+    // needs yaw 0 (180 showed back-of-head), human4 faces the board at 180,
+    // human5 is correct at 0 under the Y-180 student root.
     GameObject[] studentBodyPrefabs;
     readonly float[] studentBodyScales = new float[] { 0.856f, 0.92f, 0.567f };
-    readonly float[] studentBodyYaws = new float[] { 180f, 180f, 0f };
+    readonly float[] studentBodyYaws = new float[] { 0f, 180f, 0f };
     readonly bool[] studentBodyPitched = new bool[] { true, true, false };
+    readonly float[] studentBodyPitchDeg = new float[] { -90f, -117f, 0f };
     readonly string[] studentBodyPaths = new string[] { "Models/Humans/human3", "Models/Humans/human4", "Models/Humans/human5" };
     // Shuffle bag so consecutive seats don't repeat a body (refilled per cycle).
     List<int> bodyBag;
@@ -58,6 +62,17 @@ public class ClassroomBuilder : MonoBehaviour
 
     void Awake()
     {
+        Build();
+    }
+
+    // Full classroom build. Public (and idempotent) so headless tooling and
+    // tests can build deterministically: in batch mode Unity does not invoke
+    // Awake on AddComponent, so automation calls Build() explicitly.
+    bool built;
+    public void Build()
+    {
+        if (built) return;
+        built = true;
         studentBodyPrefabs = new GameObject[studentBodyPaths.Length];
         for (int i = 0; i < studentBodyPaths.Length; i++)
         {
@@ -515,6 +530,7 @@ public class ClassroomBuilder : MonoBehaviour
         float bodyScale = 1f;
         float bodyYaw = 180f;
         bool bodyNeedsPitch = true;
+        float bodyPitchDeg = -90f;
         if (!empty)
         {
             // Random student body, never the teacher's model (bag holds only
@@ -526,9 +542,10 @@ public class ClassroomBuilder : MonoBehaviour
                 bodyScale = studentBodyScales[pick % studentBodyScales.Length];
                 bodyYaw = studentBodyYaws[pick % studentBodyYaws.Length];
                 bodyNeedsPitch = studentBodyPitched[pick % studentBodyPitched.Length];
+                bodyPitchDeg = studentBodyPitchDeg[pick % studentBodyPitchDeg.Length];
             }
         }
-        sc.Setup(Names[idx], idx, empty, body, bodyScale, bodyYaw, bodyNeedsPitch, seatTop);
+        sc.Setup(Names[idx], idx, empty, body, bodyScale, bodyYaw, bodyNeedsPitch, bodyPitchDeg, seatTop);
         Students[idx] = sc;
     }
 

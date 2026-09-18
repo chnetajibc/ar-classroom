@@ -7,6 +7,7 @@ public class StudentController : MonoBehaviour
 {
     public string studentName = "Student";
     public bool isEmptySeat = false;
+    public string bodyId = "?"; // prefab asset name / procedural / empty (diagnostics)
 
     GameObject headGO;
     GameObject laptopScreen;
@@ -34,15 +35,16 @@ public class StudentController : MonoBehaviour
         new Color(0.75f, 0.5f, 1f), new Color(0.3f, 0.9f, 0.85f),
     };
 
-    public void Setup(string name, int colorIndex, bool empty, GameObject bodyPrefab, float bodyScale, float bodyYaw, bool bodyNeedsPitch, float seatTopY)
+    public void Setup(string name, int colorIndex, bool empty, GameObject bodyPrefab, float bodyScale, float bodyYaw, bool bodyNeedsPitch, float bodyPitchDeg, float seatTopY)
     {
         studentName = name;
         isEmptySeat = empty;
+        bodyId = empty ? "empty" : (bodyPrefab != null ? bodyPrefab.name : "procedural");
         phase = Random.Range(0f, 10f);
-        Build(colorIndex, bodyPrefab, bodyScale, bodyYaw, bodyNeedsPitch, seatTopY);
+        Build(colorIndex, bodyPrefab, bodyScale, bodyYaw, bodyNeedsPitch, bodyPitchDeg, seatTopY);
     }
 
-    void Build(int colorIndex, GameObject bodyPrefab, float bodyScale, float bodyYaw, bool bodyNeedsPitch, float seatTopY)
+    void Build(int colorIndex, GameObject bodyPrefab, float bodyScale, float bodyYaw, bool bodyNeedsPitch, float bodyPitchDeg, float seatTopY)
     {
         if (isEmptySeat)
         {
@@ -88,8 +90,10 @@ public class StudentController : MonoBehaviour
         }
         headGO.name = "Body";
         headGO.transform.localPosition = Vector3.zero;
+        // Per-model pitch tips Z-up downloads upright (human4 needs -117, see
+        // ClassroomBuilder), then yaw faces the board.
         bodyBaseRot = bodyNeedsPitch
-            ? Quaternion.Euler(0, bodyYaw, 0) * Quaternion.Euler(-90f, 0, 0)
+            ? Quaternion.Euler(0, bodyYaw, 0) * Quaternion.Euler(bodyPitchDeg, 0, 0)
             : Quaternion.Euler(0, bodyYaw, 0);
         headGO.transform.localRotation = bodyBaseRot;
         headGO.transform.localScale = Vector3.one * bodyScale;
