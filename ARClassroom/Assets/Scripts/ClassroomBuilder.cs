@@ -87,8 +87,10 @@ public class ClassroomBuilder : MonoBehaviour
                 studentBodyPrefabs[i] = null;
             }
         }
-        deskPrefab = ValidateFurniture("Models/Kenney/desk");
-        chairPrefab = ValidateFurniture("Models/Kenney/chair");
+        deskPrefab = ValidateFurniture("Models/Internet/HighQualityDesk");
+        if (deskPrefab == null) deskPrefab = ValidateFurniture("Models/Kenney/desk");
+        chairPrefab = ValidateFurniture("Models/Internet/HighQualityChair");
+        if (chairPrefab == null) chairPrefab = ValidateFurniture("Models/Kenney/chair");
         laptopPrefab = ValidateFurniture("Models/Kenney/laptop");
         // Regenerate from scratch: clear anything generated earlier (e.g. by the
         // Setup menu in edit mode and saved into the scene) so Play never stacks
@@ -254,25 +256,35 @@ public class ClassroomBuilder : MonoBehaviour
         rightWall.transform.localScale = new Vector3(0.15f, 3f, 8f);
         rightWall.GetComponent<Renderer>().material = Mat(new Color(0.85f, 0.86f, 0.9f));
 
-        // Add Realistic High-Quality Doors and Windows
-        GameObject doorPrefab = Resources.Load<GameObject>("Models/Internet/HighQualityDoor");
-        GameObject windowPrefab = Resources.Load<GameObject>("Models/Internet/HighQualityWindow");
+        // Add Roof
+        var roof = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        roof.name = "Roof";
+        roof.transform.SetParent(transform, false);
+        roof.transform.localPosition = new Vector3(0, 3.05f, 1.5f);
+        roof.transform.localScale = new Vector3(10f, 0.1f, 8f);
+        roof.GetComponent<Renderer>().material = Mat(new Color(0.95f, 0.95f, 0.98f));
+
+        // Add Realistic Doors and Windows
+        GameObject doorPrefab = Resources.Load<GameObject>("Models/Kenney/doorwayFront");
+        GameObject windowPrefab = Resources.Load<GameObject>("Models/Kenney/wallWindow");
         
         if (doorPrefab != null) {
             var door = Instantiate(doorPrefab, transform, false);
             door.name = "Door";
-            door.transform.localPosition = new Vector3(4.9f, 0f, -1.0f);
+            // Scale reduced to fix the massive size. 
+            // Position shifted down to touch the floor.
+            door.transform.localScale = Vector3.one * 0.18f;
             door.transform.localRotation = Quaternion.Euler(0, -90, 0);
-            door.transform.localScale = Vector3.one * 0.4f;
+            door.transform.localPosition = new Vector3(4.9f, 0.0f, -1.0f);
         }
 
         if (windowPrefab != null) {
             for (int z = 0; z <= 4; z += 2) {
                 var window = Instantiate(windowPrefab, transform, false);
                 window.name = $"Window_{z}";
-                window.transform.localPosition = new Vector3(-4.9f, 0f, z);
+                window.transform.localScale = Vector3.one * 0.15f;
                 window.transform.localRotation = Quaternion.Euler(0, 90, 0);
-                window.transform.localScale = Vector3.one * 0.4f;
+                window.transform.localPosition = new Vector3(-4.9f, 1.2f, z);
             }
         }
     }
@@ -354,7 +366,7 @@ public class ClassroomBuilder : MonoBehaviour
 
     void BuildSeat(int r, int c, int idx, Material deskMat, Material chairMat)
     {
-        BuildSeatUnit(r, c, idx, deskMat, chairMat, false);
+        BuildSeatUnit(r, c, idx, deskMat, chairMat, true); // true = empty seat
     }
 
     // Last-resort path: plain primitives, no external assets at all.
@@ -541,9 +553,10 @@ public class ClassroomBuilder : MonoBehaviour
         l.intensity = 1.1f;
         sun.transform.localRotation = Quaternion.Euler(50, -30, 0);
 
-        // Add Realistic High-Quality Tubelights and Fans
-        GameObject fanPrefab = Resources.Load<GameObject>("Models/Internet/HighQualityFan");
+        // Add Realistic Tubelights and Fans from downloaded Kenney kit
+        GameObject fanPrefab = Resources.Load<GameObject>("Models/Kenney/ceilingFan");
         GameObject lightPrefab = Resources.Load<GameObject>("Models/Internet/HighQualityTubelight");
+        if (lightPrefab == null) lightPrefab = Resources.Load<GameObject>("Models/Kenney/lampSquareCeiling");
         
         for(int x = -2; x <= 2; x += 4)
         {
@@ -552,15 +565,15 @@ public class ClassroomBuilder : MonoBehaviour
                 if(fanPrefab != null) {
                     var fan = Instantiate(fanPrefab, transform, false);
                     fan.name = $"CeilingFan_{x}_{z}";
-                    fan.transform.localPosition = new Vector3(x, 3.0f, z);
-                    fan.transform.localScale = Vector3.one * 0.5f;
+                    fan.transform.localPosition = new Vector3(x, 2.95f, z);
+                    fan.transform.localScale = Vector3.one * 0.12f;
                 }
                 
                 if(lightPrefab != null) {
                     var light = Instantiate(lightPrefab, transform, false);
                     light.name = $"Tubelight_{x}_{z}";
-                    light.transform.localPosition = new Vector3(x, 3.0f, z + 1.5f);
-                    light.transform.localScale = Vector3.one * 0.5f;
+                    light.transform.localPosition = new Vector3(x, 2.95f, z + 1.5f);
+                    light.transform.localScale = Vector3.one * 0.12f;
                     
                     var pointLight = new GameObject("PointLight");
                     pointLight.transform.SetParent(light.transform, false);
