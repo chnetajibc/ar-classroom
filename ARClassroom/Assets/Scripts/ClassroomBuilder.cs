@@ -87,10 +87,8 @@ public class ClassroomBuilder : MonoBehaviour
                 studentBodyPrefabs[i] = null;
             }
         }
-        deskPrefab = ValidateFurniture("Models/Internet/HighQualityDesk");
-        if (deskPrefab == null) deskPrefab = ValidateFurniture("Models/Kenney/desk");
-        chairPrefab = ValidateFurniture("Models/Internet/HighQualityChair");
-        if (chairPrefab == null) chairPrefab = ValidateFurniture("Models/Kenney/chair");
+        deskPrefab = ValidateFurniture("Models/Kenney/desk");
+        chairPrefab = ValidateFurniture("Models/Kenney/chair");
         laptopPrefab = ValidateFurniture("Models/Kenney/laptop");
         // Regenerate from scratch: clear anything generated earlier (e.g. by the
         // Setup menu in edit mode and saved into the scene) so Play never stacks
@@ -387,7 +385,7 @@ public class ClassroomBuilder : MonoBehaviour
         // Generous spacing for the bulky FBX furniture: 2.2m columns, 1.6m rows.
         float x = (c - (cols - 1) / 2f) * 2.2f;
         float z = r * 1.6f;
-        bool empty = true; // force all to empty to ignore people for now
+        bool empty = System.Array.IndexOf(emptySeats, idx) >= 0;
 
         var unit = new GameObject($"SeatUnit_{r}_{c}");
         unit.transform.SetParent(transform, false);
