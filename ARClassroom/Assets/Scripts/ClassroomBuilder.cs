@@ -34,11 +34,11 @@ public class ClassroomBuilder : MonoBehaviour
     // needs yaw 0 (180 showed back-of-head), human4 faces the board at 180,
     // human5 is correct at 0 under the Y-180 student root.
     GameObject[] studentBodyPrefabs;
-    readonly float[] studentBodyScales = new float[] { 0.856f, 0.92f, 0.567f };
-    readonly float[] studentBodyYaws = new float[] { 0f, 180f, 0f };
-    readonly bool[] studentBodyPitched = new bool[] { true, true, false };
-    readonly float[] studentBodyPitchDeg = new float[] { -90f, -117f, 0f };
-    readonly string[] studentBodyPaths = new string[] { "Models/Humans/human3", "Models/Humans/human4", "Models/Humans/human5" };
+    readonly float[] studentBodyScales = new float[] { 1.0f, 0.856f, 0.92f, 0.567f };
+    readonly float[] studentBodyYaws = new float[] { 180f, 0f, 180f, 0f };
+    readonly bool[] studentBodyPitched = new bool[] { false, true, true, false };
+    readonly float[] studentBodyPitchDeg = new float[] { 0f, -90f, -117f, 0f };
+    readonly string[] studentBodyPaths = new string[] { "Models/Internet/StudentSitting", "Models/Humans/human3", "Models/Humans/human4", "Models/Humans/human5" };
     // Shuffle bag so consecutive seats don't repeat a body (refilled per cycle).
     List<int> bodyBag;
 
@@ -211,11 +211,7 @@ public class ClassroomBuilder : MonoBehaviour
 
     void BuildRoom()
     {
-        // Roomy footprint 10m x 8m (x in [-5,5], z in [-2.5,5.5]): the realistic
-        // FBX desks/chairs/bodies are bulkier than the old primitive slabs, so
-        // the room was widened to keep chairs, students and the tutor's patrol
-        // lane clear of the walls.
-        // Floor platform
+        // Roomy footprint 10m x 8m (x in [-5,5], z in [-2.5,5.5])
         var floor = GameObject.CreatePrimitive(PrimitiveType.Cube);
         floor.name = "Floor";
         floor.transform.SetParent(transform, false);
@@ -223,7 +219,6 @@ public class ClassroomBuilder : MonoBehaviour
         floor.transform.localScale = new Vector3(10f, 0.1f, 8f);
         floor.GetComponent<Renderer>().material = Mat(new Color(0.55f, 0.42f, 0.3f));
 
-        // Rug under desks
         var rug = GameObject.CreatePrimitive(PrimitiveType.Cube);
         rug.name = "Rug";
         rug.transform.SetParent(transform, false);
@@ -231,7 +226,6 @@ public class ClassroomBuilder : MonoBehaviour
         rug.transform.localScale = new Vector3(7.6f, 0.02f, 5.2f);
         rug.GetComponent<Renderer>().material = Mat(new Color(0.16f, 0.25f, 0.45f));
 
-        // Front wall (behind board)
         var wall = GameObject.CreatePrimitive(PrimitiveType.Cube);
         wall.name = "FrontWall";
         wall.transform.SetParent(transform, false);
@@ -239,7 +233,6 @@ public class ClassroomBuilder : MonoBehaviour
         wall.transform.localScale = new Vector3(10f, 3f, 0.15f);
         wall.GetComponent<Renderer>().material = Mat(new Color(0.88f, 0.89f, 0.92f));
 
-        // Boundary walls: back + left + right so the room feels enclosed
         var backWall = GameObject.CreatePrimitive(PrimitiveType.Cube);
         backWall.name = "BackWall";
         backWall.transform.SetParent(transform, false);
@@ -261,10 +254,27 @@ public class ClassroomBuilder : MonoBehaviour
         rightWall.transform.localScale = new Vector3(0.15f, 3f, 8f);
         rightWall.GetComponent<Renderer>().material = Mat(new Color(0.85f, 0.86f, 0.9f));
 
-        // Wall text was moved onto the blackboard (BoardController topics):
-        // walls stay clean for readability — all DSA posters + banner content
-        // now lives on the board's high-res World-Space Canvas (880x480 @
-        // 0.005 scale ≈ 200px/m) where text stays crisp. See BoardController.
+        // Add Realistic High-Quality Doors and Windows
+        GameObject doorPrefab = Resources.Load<GameObject>("Models/Internet/HighQualityDoor");
+        GameObject windowPrefab = Resources.Load<GameObject>("Models/Internet/HighQualityWindow");
+        
+        if (doorPrefab != null) {
+            var door = Instantiate(doorPrefab, transform, false);
+            door.name = "Door";
+            door.transform.localPosition = new Vector3(4.9f, 0f, -1.0f);
+            door.transform.localRotation = Quaternion.Euler(0, -90, 0);
+            door.transform.localScale = Vector3.one * 0.4f;
+        }
+
+        if (windowPrefab != null) {
+            for (int z = 0; z <= 4; z += 2) {
+                var window = Instantiate(windowPrefab, transform, false);
+                window.name = $"Window_{z}";
+                window.transform.localPosition = new Vector3(-4.9f, 0f, z);
+                window.transform.localRotation = Quaternion.Euler(0, 90, 0);
+                window.transform.localScale = Vector3.one * 0.4f;
+            }
+        }
     }
 
     void BuildBoard()
@@ -530,5 +540,37 @@ public class ClassroomBuilder : MonoBehaviour
         l.type = LightType.Directional;
         l.intensity = 1.1f;
         sun.transform.localRotation = Quaternion.Euler(50, -30, 0);
+
+        // Add Realistic High-Quality Tubelights and Fans
+        GameObject fanPrefab = Resources.Load<GameObject>("Models/Internet/HighQualityFan");
+        GameObject lightPrefab = Resources.Load<GameObject>("Models/Internet/HighQualityTubelight");
+        
+        for(int x = -2; x <= 2; x += 4)
+        {
+            for(int z = 0; z <= 4; z += 4)
+            {
+                if(fanPrefab != null) {
+                    var fan = Instantiate(fanPrefab, transform, false);
+                    fan.name = $"CeilingFan_{x}_{z}";
+                    fan.transform.localPosition = new Vector3(x, 3.0f, z);
+                    fan.transform.localScale = Vector3.one * 0.5f;
+                }
+                
+                if(lightPrefab != null) {
+                    var light = Instantiate(lightPrefab, transform, false);
+                    light.name = $"Tubelight_{x}_{z}";
+                    light.transform.localPosition = new Vector3(x, 3.0f, z + 1.5f);
+                    light.transform.localScale = Vector3.one * 0.5f;
+                    
+                    var pointLight = new GameObject("PointLight");
+                    pointLight.transform.SetParent(light.transform, false);
+                    pointLight.transform.localPosition = new Vector3(0, -0.2f, 0);
+                    var pl = pointLight.AddComponent<Light>();
+                    pl.type = LightType.Point;
+                    pl.intensity = 0.8f;
+                    pl.range = 10f;
+                }
+            }
+        }
     }
 }

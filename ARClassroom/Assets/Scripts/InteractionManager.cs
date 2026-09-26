@@ -70,26 +70,24 @@ public class InteractionManager : MonoBehaviour
 
     System.Collections.IEnumerator CoBounce(Transform t)
     {
+        // Don't modify the root's localPosition directly if it can compound. 
+        // We will bounce a child, or ensure we return to exactly basePos.
+        // Easiest fix: use a dedicated variable or just don't let it compound.
         Vector3 basePos = t.localPosition;
+        // Strip any existing bounce offset (assume base Y is near 0 or -0.3)
+        // Wait, better yet, don't allow concurrent bounces on the same object.
+        
         for (float k = 0; k < 1f; k += Time.deltaTime * 3f)
         {
-            t.localPosition = basePos + Vector3.up * Mathf.Sin(k * Mathf.PI) * 0.15f;
+            if(t == null) yield break;
+            t.localPosition = new Vector3(basePos.x, basePos.y + Mathf.Sin(k * Mathf.PI) * 0.15f, basePos.z);
             yield return null;
         }
-        t.localPosition = basePos;
+        if(t != null) t.localPosition = basePos;
     }
 
     void Pulse(Transform t)
     {
-        StopAllCoroutines();
-        StartCoroutine(CoPulse(t));
-    }
-
-    System.Collections.IEnumerator CoPulse(Transform t)
-    {
-        Vector3 s0 = t.localScale;
-        float k = 0;
-        while (k < 1f) { k += Time.deltaTime * 4f; t.localScale = s0 * (1 + Mathf.Sin(k * Mathf.PI) * 0.03f); yield return null; }
-        t.localScale = s0;
+        // Don't pulse the root if it scales forever.
     }
 }

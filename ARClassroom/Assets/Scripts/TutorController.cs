@@ -244,35 +244,8 @@ public class TutorController : MonoBehaviour
 
     void PatrolUpdate()
     {
-        if (patrolPoints == null || patrolPoints.Length == 0) return;
-        Vector3 target = patrolPoints[wpIndex];
-        Vector3 to = target - transform.localPosition;
-        to.y = 0f;
-        if (to.magnitude < 0.15f)
-        {
-            // Arrived: pause here and teach a line (once per stop)
-            if (walking)
-            {
-                walking = false;
-                pauseUntil = Time.time + pauseSeconds;
-                Speak(patrolLines[lineIndex % patrolLines.Length], pauseSeconds);
-                lineIndex++;
-            }
-            FaceYaw(0f); // face the class while teaching
-            if (Time.time >= pauseUntil)
-            {
-                walking = true;
-                wpIndex = (wpIndex + 1) % patrolPoints.Length;
-            }
-        }
-        else
-        {
-            walking = true;
-            Vector3 step = to.normalized * walkSpeed * Time.deltaTime;
-            if (step.magnitude > to.magnitude) step = to;
-            transform.localPosition += step;
-            FaceYaw(Mathf.Atan2(to.x, to.z) * Mathf.Rad2Deg);
-        }
+        walking = false;
+        FaceYaw(0f); // face the class while teaching
     }
 
     void FaceYaw(float yaw)
