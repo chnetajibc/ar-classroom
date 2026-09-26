@@ -366,7 +366,7 @@ public class ClassroomBuilder : MonoBehaviour
 
     void BuildSeat(int r, int c, int idx, Material deskMat, Material chairMat)
     {
-        BuildSeatUnit(r, c, idx, deskMat, chairMat, true); // true = empty seat
+        BuildSeatUnit(r, c, idx, deskMat, chairMat, false);
     }
 
     // Last-resort path: plain primitives, no external assets at all.
@@ -387,7 +387,7 @@ public class ClassroomBuilder : MonoBehaviour
         // Generous spacing for the bulky FBX furniture: 2.2m columns, 1.6m rows.
         float x = (c - (cols - 1) / 2f) * 2.2f;
         float z = r * 1.6f;
-        bool empty = System.Array.IndexOf(emptySeats, idx) >= 0;
+        bool empty = true; // force all to empty to ignore people for now
 
         var unit = new GameObject($"SeatUnit_{r}_{c}");
         unit.transform.SetParent(transform, false);
@@ -529,7 +529,8 @@ public class ClassroomBuilder : MonoBehaviour
         var tgo = new GameObject("Tutor");
         tgo.transform.SetParent(transform, false);
         tgo.transform.localPosition = new Vector3(2.9f, 0, -1.5f);
-        tgo.transform.localRotation = Quaternion.Euler(0, -50f, 0);
+        // Face students directly (0 deg)
+        tgo.transform.localRotation = Quaternion.Euler(0, 0f, 0);
         var hit = tgo.AddComponent<BoxCollider>();
         hit.size = new Vector3(1.2f, 2.4f, 1.2f);
         hit.center = new Vector3(0, 1.2f, 0);
