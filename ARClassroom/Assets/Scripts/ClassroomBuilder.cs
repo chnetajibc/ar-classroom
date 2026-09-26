@@ -258,9 +258,9 @@ public class ClassroomBuilder : MonoBehaviour
         var roof = GameObject.CreatePrimitive(PrimitiveType.Cube);
         roof.name = "Roof";
         roof.transform.SetParent(transform, false);
-        roof.transform.localPosition = new Vector3(0, 3.05f, 1.5f);
-        roof.transform.localScale = new Vector3(10f, 0.1f, 8f);
-        roof.GetComponent<Renderer>().material = Mat(new Color(0.95f, 0.95f, 0.98f));
+        roof.transform.localPosition = new Vector3(0, 3.1f, 1.5f);
+        roof.transform.localScale = new Vector3(10.3f, 0.2f, 8.3f);
+        roof.GetComponent<Renderer>().material = Mat(new Color(0.8f, 0.8f, 0.85f));
 
         // Add Realistic Doors and Windows
         GameObject doorPrefab = Resources.Load<GameObject>("Models/Kenney/doorwayFront");
