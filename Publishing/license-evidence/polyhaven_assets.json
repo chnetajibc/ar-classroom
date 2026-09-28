@@ -1,0 +1,217 @@
+{
+  "retrieved": "2026-09-28",
+  "source": "https://api.polyhaven.com/info/<id>",
+  "license": "CC0 (https://polyhaven.com/license)",
+  "assets": {
+    "SchoolDesk_01": {
+      "name": "School Desk 01",
+      "authors": {
+        "Ethan Place": "All"
+      },
+      "type": 2,
+      "polycount": 4162,
+      "url": "https://polyhaven.com/a/SchoolDesk_01"
+    },
+    "SchoolChair_01": {
+      "name": "School Chair 01",
+      "authors": {
+        "Ethan Place": "All"
+      },
+      "type": 2,
+      "polycount": 5072,
+      "url": "https://polyhaven.com/a/SchoolChair_01"
+    },
+    "metal_office_desk": {
+      "name": "Metal Office Desk",
+      "authors": {
+        "Ulan Cabanilla": "All"
+      },
+      "type": 2,
+      "polycount": 6898,
+      "url": "https://polyhaven.com/a/metal_office_desk"
+    },
+    "modern_arm_chair_01": {
+      "name": "Modern Arm Chair 01",
+      "authors": {
+        "Vibrant Nordic": "All"
+      },
+      "type": 2,
+      "polycount": 8916,
+      "url": "https://polyhaven.com/a/modern_arm_chair_01"
+    },
+    "wooden_bookshelf_worn": {
+      "name": "Wooden Bookshelf Worn",
+      "authors": {
+        "Ulan Cabanilla": "All"
+      },
+      "type": 2,
+      "polycount": 10106,
+      "url": "https://polyhaven.com/a/wooden_bookshelf_worn"
+    },
+    "drawer_cabinet": {
+      "name": "Drawer Cabinet",
+      "authors": {
+        "Ulan Cabanilla": "All"
+      },
+      "type": 2,
+      "polycount": 26406,
+      "url": "https://polyhaven.com/a/drawer_cabinet"
+    },
+    "Shelf_01": {
+      "name": "Shelf 01",
+      "authors": {
+        "Gabriel Radi\u0107": "All"
+      },
+      "type": 2,
+      "polycount": 182,
+      "url": "https://polyhaven.com/a/Shelf_01"
+    },
+    "classic_laptop": {
+      "name": "Classic Laptop",
+      "authors": {
+        "Arrangemonk": "All"
+      },
+      "type": 2,
+      "polycount": 14450,
+      "url": "https://polyhaven.com/a/classic_laptop"
+    },
+    "book_encyclopedia_set_01": {
+      "name": "Book Encyclopedia Set 01",
+      "authors": {
+        "John Malcolm": "All"
+      },
+      "type": 2,
+      "polycount": 67306,
+      "url": "https://polyhaven.com/a/book_encyclopedia_set_01"
+    },
+    "binder_notebook": {
+      "name": "Binder Notebook",
+      "authors": {
+        "DaDrood": "All"
+      },
+      "type": 2,
+      "polycount": 18077,
+      "url": "https://polyhaven.com/a/binder_notebook"
+    },
+    "stationery_supplies": {
+      "name": "Stationery Supplies",
+      "authors": {
+        "Mateusz Sadek": "All"
+      },
+      "type": 2,
+      "polycount": 4412,
+      "url": "https://polyhaven.com/a/stationery_supplies"
+    },
+    "clipboard": {
+      "name": "Clipboard",
+      "authors": {
+        "ProgrammerOnCoffee": "All"
+      },
+      "type": 2,
+      "polycount": 6176,
+      "url": "https://polyhaven.com/a/clipboard"
+    },
+    "korean_fire_extinguisher_01": {
+      "name": "Korean Fire Extinguisher 01",
+      "authors": {
+        "UM JOORIN": "All"
+      },
+      "type": 2,
+      "polycount": 9913,
+      "url": "https://polyhaven.com/a/korean_fire_extinguisher_01"
+    },
+    "wall_clock": {
+      "name": "Wall Clock",
+      "authors": {
+        "PierreB3D": "All"
+      },
+      "type": 2,
+      "polycount": 3658,
+      "url": "https://polyhaven.com/a/wall_clock"
+    },
+    "potted_plant_01": {
+      "name": "Potted Plant 01",
+      "authors": {
+        "Rico Cilliers": "All"
+      },
+      "type": 2,
+      "polycount": 96030,
+      "url": "https://polyhaven.com/a/potted_plant_01"
+    },
+    "potted_plant_04": {
+      "name": "Potted Plant 04",
+      "authors": {
+        "James Ray Cock": "All"
+      },
+      "type": 2,
+      "polycount": 6097,
+      "url": "https://polyhaven.com/a/potted_plant_04"
+    },
+    "ceiling_fan": {
+      "name": "Ceiling Fan",
+      "authors": {
+        "Ulan Cabanilla": "All"
+      },
+      "type": 2,
+      "polycount": 16356,
+      "url": "https://polyhaven.com/a/ceiling_fan"
+    },
+    "mounted_fluorescent_lights": {
+      "name": "Mounted Fluorescent Lights",
+      "authors": {
+        "Ulan Cabanilla": "All"
+      },
+      "type": 2,
+      "polycount": 17820,
+      "url": "https://polyhaven.com/a/mounted_fluorescent_lights"
+    },
+    "plastered_wall_04": {
+      "name": "Plastered Wall 04",
+      "authors": {
+        "Rob Tuytel": "All"
+      },
+      "type": 1,
+      "polycount": null,
+      "url": "https://polyhaven.com/a/plastered_wall_04"
+    },
+    "laminate_floor_02": {
+      "name": "Laminate Floor 02",
+      "authors": {
+        "Dario Barresi": "Processing",
+        "Charlotte Baglioni": "photography"
+      },
+      "type": 1,
+      "polycount": null,
+      "url": "https://polyhaven.com/a/laminate_floor_02"
+    },
+    "slate_floor_03": {
+      "name": "Slate Floor 03",
+      "authors": {
+        "Dimitrios Savva": "All"
+      },
+      "type": 1,
+      "polycount": null,
+      "url": "https://polyhaven.com/a/slate_floor_03"
+    },
+    "dark_wood": {
+      "name": "Dark Wood",
+      "authors": {
+        "Dario Barresi": "Baking",
+        "Dimitrios Savva": "Photography",
+        "Rico Cilliers": "Tiling"
+      },
+      "type": 1,
+      "polycount": null,
+      "url": "https://polyhaven.com/a/dark_wood"
+    },
+    "air_museum_playground": {
+      "name": "Air Museum Playground",
+      "authors": {
+        "Sergej Majboroda": "All"
+      },
+      "type": 0,
+      "polycount": null,
+      "url": "https://polyhaven.com/a/air_museum_playground"
+    }
+  }
+}

@@ -1,0 +1,111 @@
+{
+  "retrieved": "2026-09-28",
+  "source": "https://poly.pizza/m/<id> (page state: Licence, Creator)",
+  "items": {
+    "WomanA": {
+      "title": "Woman",
+      "licence": "CC0 1.0",
+      "creator": "Quaternius",
+      "url": "https://poly.pizza/m/AQsd9ngvKU",
+      "tris": 0
+    },
+    "WomanCasual": {
+      "title": "Woman Casual",
+      "licence": "CC0 1.0",
+      "creator": "Quaternius",
+      "url": "https://poly.pizza/m/jpKRgGDxhk",
+      "tris": 0
+    },
+    "WomanDress": {
+      "title": "Woman in Dress",
+      "licence": "CC0 1.0",
+      "creator": "Quaternius",
+      "url": "https://poly.pizza/m/zMyPlQXBzq",
+      "tris": 0
+    },
+    "WomanTank": {
+      "title": "Woman in Tank Top",
+      "licence": "CC0 1.0",
+      "creator": "Quaternius",
+      "url": "https://poly.pizza/m/XqzeZGB7iU",
+      "tris": 0
+    },
+    "ManA": {
+      "title": "Man",
+      "licence": "CC0 1.0",
+      "creator": "Quaternius",
+      "url": "https://poly.pizza/m/HMnuH5geEG",
+      "tris": 1216
+    },
+    "ManB": {
+      "title": "Man",
+      "licence": "CC0 1.0",
+      "creator": "Quaternius",
+      "url": "https://poly.pizza/m/fjHyMd5Wxw",
+      "tris": 0
+    },
+    "ManLongSleeves": {
+      "title": "Man in Long Sleeves",
+      "licence": "CC0 1.0",
+      "creator": "Quaternius",
+      "url": "https://poly.pizza/m/DLptRuewTn",
+      "tris": 0
+    },
+    "CasualCharacter": {
+      "title": "Casual Character",
+      "licence": "CC0 1.0",
+      "creator": "Quaternius",
+      "url": "https://poly.pizza/m/kZ3DmIoGip",
+      "tris": 3350
+    },
+    "HoodieCharacter": {
+      "title": "Hoodie Character",
+      "licence": "CC0 1.0",
+      "creator": "Quaternius",
+      "url": "https://poly.pizza/m/gKLBoRsyKe",
+      "tris": 4318
+    },
+    "BeachCharacter": {
+      "title": "Beach Character",
+      "licence": "CC0 1.0",
+      "creator": "Quaternius",
+      "url": "https://poly.pizza/m/DojKLcO34E",
+      "tris": 3964
+    },
+    "BackpackGreen": {
+      "title": "Backpack",
+      "licence": "CC0 1.0",
+      "creator": "Quaternius",
+      "url": "https://poly.pizza/m/2g9Jm7kvIU",
+      "tris": 1748
+    },
+    "BackpackBlue": {
+      "title": "Backpack",
+      "licence": "CC0 1.0",
+      "creator": "Quaternius",
+      "url": "https://poly.pizza/m/vF7TuXCPDH",
+      "tris": 0
+    },
+    "ShoulderBag": {
+      "title": "Bag",
+      "licence": "CC0 1.0",
+      "creator": "Quaternius",
+      "url": "https://poly.pizza/m/Wq1JPPqHZS",
+      "tris": 0
+    },
+    "TrashBin": {
+      "title": "Trashcan Small",
+      "licence": "CC0 1.0",
+      "creator": "Quaternius",
+      "url": "https://poly.pizza/m/ZWYTK2SmBA",
+      "tris": 432
+    },
+    "Corkboard": {
+      "title": "Wall Corkboard",
+      "licence": "CC0 1.0",
+      "creator": "CreativeTrio",
+      "url": "https://poly.pizza/m/U8yQZ9l0HZ",
+      "tris": 218
+    }
+  }
+}

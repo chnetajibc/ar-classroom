@@ -1,0 +1,132 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &7930777324945386605
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 351724285285048456}
+  m_Layer: 0
+  m_Name: TeacherDesk
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &351724285285048456
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7930777324945386605}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 3595174262782293508}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &3922114711855731183
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 351724285285048456}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: 01611ff531cb649279fa0c10ebd50fc2, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.0000006556511
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 01611ff531cb649279fa0c10ebd50fc2, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 01611ff531cb649279fa0c10ebd50fc2, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.004496634
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 01611ff531cb649279fa0c10ebd50fc2, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 01611ff531cb649279fa0c10ebd50fc2, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 01611ff531cb649279fa0c10ebd50fc2, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 01611ff531cb649279fa0c10ebd50fc2, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 01611ff531cb649279fa0c10ebd50fc2, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 01611ff531cb649279fa0c10ebd50fc2, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 01611ff531cb649279fa0c10ebd50fc2, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8001442770233915590, guid: 01611ff531cb649279fa0c10ebd50fc2, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 0d9946ae49c054c258b2e0a4e930d8a0, type: 2}
+    - target: {fileID: -6788760202203774025, guid: 01611ff531cb649279fa0c10ebd50fc2, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 0d9946ae49c054c258b2e0a4e930d8a0, type: 2}
+    - target: {fileID: -5444580713970612000, guid: 01611ff531cb649279fa0c10ebd50fc2, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 0d9946ae49c054c258b2e0a4e930d8a0, type: 2}
+    - target: {fileID: -143564288120342637, guid: 01611ff531cb649279fa0c10ebd50fc2, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 0d9946ae49c054c258b2e0a4e930d8a0, type: 2}
+    - target: {fileID: 919132149155446097, guid: 01611ff531cb649279fa0c10ebd50fc2, type: 3}
+      propertyPath: m_Name
+      value: TeacherDesk
+      objectReference: {fileID: 0}
+    - target: {fileID: 1222082795065519631, guid: 01611ff531cb649279fa0c10ebd50fc2, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 0d9946ae49c054c258b2e0a4e930d8a0, type: 2}
+    - target: {fileID: 1526292517382543273, guid: 01611ff531cb649279fa0c10ebd50fc2, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 0d9946ae49c054c258b2e0a4e930d8a0, type: 2}
+    - target: {fileID: 4499323753057946557, guid: 01611ff531cb649279fa0c10ebd50fc2, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 0d9946ae49c054c258b2e0a4e930d8a0, type: 2}
+    - target: {fileID: 4797097874790350539, guid: 01611ff531cb649279fa0c10ebd50fc2, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 0d9946ae49c054c258b2e0a4e930d8a0, type: 2}
+    - target: {fileID: 5253105076483073292, guid: 01611ff531cb649279fa0c10ebd50fc2, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 0d9946ae49c054c258b2e0a4e930d8a0, type: 2}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 01611ff531cb649279fa0c10ebd50fc2, type: 3}
+--- !u!4 &3595174262782293508 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 01611ff531cb649279fa0c10ebd50fc2, type: 3}
+  m_PrefabInstance: {fileID: 3922114711855731183}
+  m_PrefabAsset: {fileID: 0}

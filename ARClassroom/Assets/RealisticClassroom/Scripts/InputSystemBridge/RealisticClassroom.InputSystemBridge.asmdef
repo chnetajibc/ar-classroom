@@ -1,0 +1,19 @@
+{
+    "name": "RealisticClassroom.InputSystemBridge",
+    "rootNamespace": "RealisticClassroom.InputSystemBridge",
+    "references": [
+        "RealisticClassroom.Runtime",
+        "Unity.InputSystem"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "ENABLE_INPUT_SYSTEM"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

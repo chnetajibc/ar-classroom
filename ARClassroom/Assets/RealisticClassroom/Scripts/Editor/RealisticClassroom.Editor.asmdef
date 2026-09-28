@@ -1,0 +1,28 @@
+{
+    "name": "RealisticClassroom.Editor",
+    "rootNamespace": "RealisticClassroom.EditorTools",
+    "references": [
+        "RealisticClassroom.Runtime",
+        "Unity.RenderPipelines.Core.Runtime",
+        "Unity.RenderPipelines.Universal.Runtime"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "REALISTIC_CLASSROOM_URP"
+    ],
+    "versionDefines": [
+        {
+            "name": "com.unity.render-pipelines.universal",
+            "expression": "12.0.0",
+            "define": "REALISTIC_CLASSROOM_URP"
+        }
+    ],
+    "noEngineReferences": false
+}

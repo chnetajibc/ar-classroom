@@ -53,3 +53,7 @@ mono_crash*.blob
 # temporary conversion staging (never shipped)
 /Assets/_Convert/
 /Assets/_Convert.meta
+
+# downloaded source models and staging (re-fetch with Publishing/tools; never shipped)
+/Assets/_Publishing/Sources/
+/Assets/_Publishing/Sources.meta
