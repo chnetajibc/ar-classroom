@@ -16,13 +16,27 @@ ZIP="$PUB/dist/${NAME}_direct-sales.zip"
 STAGE="$PUB/build/release/${NAME}"
 PRODUCT="$ROOT/ARClassroom/Assets/RealisticClassroom"
 
-# 1. publisher details
+# 1. publisher details (read as KEY=VALUE lines, quotes optional, no trailing comments; the file is never executed)
 PUBLISHER_NAME=""; SUPPORT_EMAIL=""; WEBSITE=""; JURISDICTION=""
-if [ -f publisher.env ]; then set -a; . ./publisher.env; set +a; fi
+if [ -f publisher.env ]; then
+  while IFS= read -r line || [ -n "$line" ]; do
+    case "$line" in ''|'#'*) continue ;; esac
+    case "$line" in *=*) ;; *) continue ;; esac
+    key="$(printf '%s' "${line%%=*}" | tr -d '[:space:]')"
+    val="$(printf '%s' "${line#*=}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e 's/^"\(.*\)"$/\1/' -e "s/^'\(.*\)'\$/\1/")"
+    case "$key" in PUBLISHER_NAME|SUPPORT_EMAIL|WEBSITE|JURISDICTION) printf -v "$key" '%s' "$val" ;; esac
+  done < publisher.env
+fi
+# values copied unchanged from publisher.env.example count as "not filled in"
+case "$PUBLISHER_NAME" in "Your Name or Studio") PUBLISHER_NAME="" ;; esac
+case "$SUPPORT_EMAIL" in *@example.com) SUPPORT_EMAIL="" ;; esac
+case "$WEBSITE" in https://example.com*) WEBSITE="" ;; esac
+case "$JURISDICTION" in "Your country"*) JURISDICTION="" ;; esac
+esc() { printf '%s' "$1" | sed -e 's/[\\&|]/\\&/g'; }   # makes a value safe inside a sed replacement (& \ and the | delimiter)
 missing=""
 for v in PUBLISHER_NAME SUPPORT_EMAIL WEBSITE JURISDICTION; do [ -z "${!v}" ] && missing="$missing $v"; done
 if [ -n "$missing" ]; then
-  echo "publisher.env is missing:$missing (copy publisher.env.example to publisher.env and fill it in)"
+  echo "publisher.env is missing or still has the example values for:$missing (copy publisher.env.example to publisher.env and fill it in)"
   [ "${ALLOW_PLACEHOLDERS:-0}" = "1" ] || exit 1
   echo "ALLOW_PLACEHOLDERS=1 -> continuing; the outputs are NOT ready to publish"
 fi
@@ -51,8 +65,8 @@ rm -rf "$STAGE"; mkdir -p "$STAGE"
 cp "$PKG" "$STAGE/"
 cp "$PRODUCT/Documentation/Documentation.pdf" "$STAGE/"
 cp "$PRODUCT/Third-Party Notices.txt" "$STAGE/"
-sed -e "s|\[PUBLISHER NAME\]|${PUBLISHER_NAME:-[PUBLISHER NAME]}|g" -e "s|\[SUPPORT EMAIL\]|${SUPPORT_EMAIL:-[SUPPORT EMAIL]}|g" \
-    -e "s|\[WEBSITE\]|${WEBSITE:-[WEBSITE]}|g" -e "s|\[JURISDICTION\]|${JURISDICTION:-[JURISDICTION]}|g" legal/EULA.md > "$STAGE/EULA.md"
+sed -e "s|\[PUBLISHER NAME\]|$(esc "${PUBLISHER_NAME:-[PUBLISHER NAME]}")|g" -e "s|\[SUPPORT EMAIL\]|$(esc "${SUPPORT_EMAIL:-[SUPPORT EMAIL]}")|g" \
+    -e "s|\[WEBSITE\]|$(esc "${WEBSITE:-[WEBSITE]}")|g" -e "s|\[JURISDICTION\]|$(esc "${JURISDICTION:-[JURISDICTION]}")|g" legal/EULA.md > "$STAGE/EULA.md"
 cat > "$STAGE/README.txt" <<TXT
 Classroom Interior Pack - Teacher & Students (URP)   v${VERSION}
 
