@@ -99,6 +99,20 @@ public class StudentController : MonoBehaviour
         headGO.transform.localScale = Vector3.one * bodyScale;
         useProceduralBody = false;
 
+        // Apply colors to fix missing materials on internet models
+        Material shirtMat = new Material(Shader.Find("Standard"));
+        shirtMat.color = ShirtColors[Mathf.Abs(colorIndex) % ShirtColors.Length];
+        Material skinMat = new Material(Shader.Find("Standard"));
+        skinMat.color = new Color(0.9f, 0.75f, 0.6f);
+        
+        foreach(var r in headGO.GetComponentsInChildren<Renderer>())
+        {
+            if (r.name.ToLower().Contains("head") || r.name.ToLower().Contains("face") || r.name.ToLower().Contains("hand"))
+                r.material = skinMat;
+            else
+                r.material = shirtMat;
+        }
+
         // Sit: measure the posed body height, drop hips onto the seat.
         float bodyH = MeasureBodyHeight(headGO);
         if (bodyH > 0.2f)

@@ -89,6 +89,20 @@ public class TutorController : MonoBehaviour
                 tutorProcedural = false;
                 headGO = bodyGO; // whole-body nod preserves the old animation code
                 armL = null; armR = null; // FBX brings its own arms
+                
+                // Fix missing textures by applying a nice material
+                Material tutorMat = new Material(Shader.Find("Standard"));
+                tutorMat.color = new Color(0.2f, 0.4f, 0.7f); // Blue suit
+                Material skinMat = new Material(Shader.Find("Standard"));
+                skinMat.color = new Color(0.9f, 0.75f, 0.6f); // Skin tone
+                
+                foreach(var r in bodyGO.GetComponentsInChildren<Renderer>())
+                {
+                    if (r.name.ToLower().Contains("head") || r.name.ToLower().Contains("face") || r.name.ToLower().Contains("hand"))
+                        r.material = skinMat;
+                    else
+                        r.material = tutorMat;
+                }
             }
             catch (System.Exception e)
             {
