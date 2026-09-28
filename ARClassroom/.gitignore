@@ -49,3 +49,7 @@ mono_crash*.blob
 /[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/*/*.bin*
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
+
+# temporary conversion staging (never shipped)
+/Assets/_Convert/
+/Assets/_Convert.meta
