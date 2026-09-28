@@ -1,0 +1,5 @@
+marketing/raw/
+build/
+dist/
+reports/*.tmp
+publisher.env
