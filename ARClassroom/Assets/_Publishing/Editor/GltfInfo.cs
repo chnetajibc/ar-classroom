@@ -34,6 +34,7 @@ namespace RealisticClassroom.Publishing
         }
 
         public Material[] Materials;
+        public string SourcePath { get; private set; }
         readonly Root root;
         readonly string dir;
         readonly byte[] bin;
@@ -41,6 +42,7 @@ namespace RealisticClassroom.Publishing
         public GltfInfo(string path)
         {
             dir = Path.GetDirectoryName(path);
+            SourcePath = path;
             string json;
             if (path.EndsWith(".glb", StringComparison.OrdinalIgnoreCase))
             {

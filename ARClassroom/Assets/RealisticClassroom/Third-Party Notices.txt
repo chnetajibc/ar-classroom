@@ -1,0 +1,68 @@
+THIRD-PARTY NOTICES - Classroom Interior Pack (RealisticClassroom)
+
+Every third-party model, texture, animation and HDRI in this package is released under the
+CC0 1.0 Universal Public Domain Dedication (https://creativecommons.org/publicdomain/zero/1.0/).
+CC0 requires no attribution and no licence text to travel with the content; the credits below are given voluntarily and
+so that you can trace every asset to its source. The scripts, prefab arrangement, demo scene, documentation and editor
+tools are original work of the publisher and are covered by the Unity Asset Store EULA.
+
+Files were converted (glTF/OBJ -> FBX, PBR maps repacked to URP layout, some parts removed or rescaled) before inclusion.
+Nothing in this package requires attribution, is share-alike, or restricts commercial use.
+
+------------------------------------------------------------------------------------------------------------------------
+1. Poly Haven  -  https://polyhaven.com  -  CC0 (https://polyhaven.com/license)
+------------------------------------------------------------------------------------------------------------------------
+Models (author in brackets):
+  School Desk 01 [Ethan Place]                          https://polyhaven.com/a/SchoolDesk_01
+  School Chair 01 [Ethan Place]                         https://polyhaven.com/a/SchoolChair_01
+  Metal Office Desk [Ulan Cabanilla]                    https://polyhaven.com/a/metal_office_desk
+  Modern Arm Chair 01 [Vibrant Nordic]                  https://polyhaven.com/a/modern_arm_chair_01
+  Wooden Bookshelf Worn [Ulan Cabanilla]                https://polyhaven.com/a/wooden_bookshelf_worn
+  Drawer Cabinet [Ulan Cabanilla]                       https://polyhaven.com/a/drawer_cabinet
+  Shelf 01 [Gabriel Radic]                              https://polyhaven.com/a/Shelf_01
+  Classic Laptop [Arrangemonk]                          https://polyhaven.com/a/classic_laptop
+  Book Encyclopedia Set 01 [John Malcolm]  (2 volumes)  https://polyhaven.com/a/book_encyclopedia_set_01
+  Binder Notebook [DaDrood]                             https://polyhaven.com/a/binder_notebook
+  Stationery Supplies [Mateusz Sadek]      (2 pens)     https://polyhaven.com/a/stationery_supplies
+  Clipboard [ProgrammerOnCoffee]                        https://polyhaven.com/a/clipboard
+  Korean Fire Extinguisher 01 [UM JOORIN]               https://polyhaven.com/a/korean_fire_extinguisher_01
+  Wall Clock [PierreB3D]                                https://polyhaven.com/a/wall_clock
+  Potted Plant 01 [Rico Cilliers]                       https://polyhaven.com/a/potted_plant_01
+  Potted Plant 04 [James Ray Cock]                      https://polyhaven.com/a/potted_plant_04
+  Ceiling Fan [Ulan Cabanilla]                          https://polyhaven.com/a/ceiling_fan
+  Mounted Fluorescent Lights [Ulan Cabanilla] (2 of 7)  https://polyhaven.com/a/mounted_fluorescent_lights
+Textures:
+  Plastered Wall 04 [Rob Tuytel]                        https://polyhaven.com/a/plastered_wall_04
+  Laminate Floor 02 [Dario Barresi, Charlotte Baglioni] https://polyhaven.com/a/laminate_floor_02
+  Slate Floor 03 [Dimitrios Savva]                      https://polyhaven.com/a/slate_floor_03
+  Dark Wood [Dario Barresi, Dimitrios Savva, Rico Cilliers] https://polyhaven.com/a/dark_wood
+HDRI:
+  Air Museum Playground [Sergej Majboroda]              https://polyhaven.com/a/air_museum_playground
+
+------------------------------------------------------------------------------------------------------------------------
+2. Kenney  -  https://kenney.nl  -  CC0
+------------------------------------------------------------------------------------------------------------------------
+  Furniture Kit 2.0: wall, wall with window, wall with doorway, door frame with door, floor tile
+  https://kenney.nl/assets/furniture-kit   (licence text: "Creative Commons Zero, CC0 - free to use in personal, educational
+  and commercial projects")
+
+------------------------------------------------------------------------------------------------------------------------
+3. Quaternius  -  https://quaternius.com  -  CC0
+------------------------------------------------------------------------------------------------------------------------
+  Universal Animation Library (Standard) 1 and 2 - humanoid animation clips
+  https://quaternius.itch.io/universal-animation-library   (its License.txt: "CC0 1.0 Universal (CC0 1.0) Public Domain Dedication")
+  Characters, via Poly Pizza (https://poly.pizza): Man (2 variants), Woman, Woman Casual, Woman in Dress, Woman in Tank Top,
+  Man in Long Sleeves, Casual Character, Hoodie Character, Beach Character.
+  Props, via Poly Pizza: Backpack (2 variants), Bag, Trashcan Small.
+
+------------------------------------------------------------------------------------------------------------------------
+4. Other CC0 sources
+------------------------------------------------------------------------------------------------------------------------
+  Wall Corkboard by CreativeTrio  -  https://poly.pizza/m/U8yQZ9l0HZ  -  CC0 1.0
+  Chalkboard - Pizarrron by DREAM_SEARCH_REPEAT (mesh only; its photo textures are NOT included; the materials use Poly Haven textures)
+  https://opengameart.org/content/chalkboard-pizarrron  -  CC0
+
+------------------------------------------------------------------------------------------------------------------------
+Tools used during authoring (not distributed with this package)
+------------------------------------------------------------------------------------------------------------------------
+  Unity FBX Exporter (com.unity.formats.fbx) and glTFast (com.unity.cloud.gltfast) were used to convert source files.

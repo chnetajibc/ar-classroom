@@ -11,7 +11,7 @@ namespace RealisticClassroom.Publishing
     /// <summary>Headless verification helpers: offscreen renders to PNG and edit-mode pose sampling.</summary>
     public static class ScreenshotTool
     {
-        public static string Capture(string outPath, Vector3 pos, Vector3 lookAt, float fov = 60f, int width = 1600, int height = 900)
+        public static string Capture(string outPath, Vector3 pos, Vector3 lookAt, float fov = 60f, int width = 1600, int height = 900, Color? background = null)
         {
             var go = new GameObject("__ShotCam");
             try
@@ -23,7 +23,8 @@ namespace RealisticClassroom.Publishing
                 cam.nearClipPlane = 0.05f;
                 cam.farClipPlane = 200f;
                 cam.allowHDR = true;
-                cam.clearFlags = CameraClearFlags.Skybox;
+                cam.clearFlags = background.HasValue ? CameraClearFlags.SolidColor : CameraClearFlags.Skybox;
+                if (background.HasValue) cam.backgroundColor = background.Value;
                 var data = go.AddComponent<UniversalAdditionalCameraData>();
                 data.renderPostProcessing = true;
                 data.antialiasing = AntialiasingMode.SubpixelMorphologicalAntiAliasing;

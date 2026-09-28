@@ -9,6 +9,12 @@ namespace RealisticClassroom.Publishing
     /// <summary>Turns glTF PBR material descriptors into standalone URP/Lit materials with URP-layout texture maps.</summary>
     public static class UrpMaterialFactory
     {
+        // identical source images (shared by several materials/parts) are exported once and reused
+        static readonly System.Collections.Generic.Dictionary<string, string> exported = new System.Collections.Generic.Dictionary<string, string>();
+        public static void ResetCache() { exported.Clear(); }
+
+        static string Key(GltfInfo gi, int image, string kind, int size) { return gi.SourcePath + "#" + image + "#" + kind + "#" + size; }
+
         public static Material Create(string matPath, string namePrefix, GltfInfo gi, GltfInfo.Material gm, string textureDir, int maxTex)
         {
             Directory.CreateDirectory(Path.GetDirectoryName(matPath));
@@ -19,17 +25,27 @@ namespace RealisticClassroom.Publishing
 
             if (gm.baseTex >= 0)
             {
-                var bytes = gi.ImageBytes(gm.baseTex, out var ext);
-                var p = ImageTools.ExportColor(bytes, textureDir + "/" + tag + "_BaseColor", maxTex, true);
-                ImageTools.SetImport(p, true, false, maxTex);
+                var key = Key(gi, gm.baseTex, "base", maxTex);
+                if (!exported.TryGetValue(key, out var p))
+                {
+                    var bytes = gi.ImageBytes(gm.baseTex, out var ext);
+                    p = ImageTools.ExportColor(bytes, textureDir + "/" + tag + "_BaseColor", maxTex, true);
+                    ImageTools.SetImport(p, true, false, maxTex);
+                    exported[key] = p;
+                }
                 mat.SetTexture("_BaseMap", AssetDatabase.LoadAssetAtPath<Texture2D>(p));
             }
 
             if (gm.normalTex >= 0)
             {
-                var bytes = gi.ImageBytes(gm.normalTex, out var ext);
-                var p = ImageTools.ExportColor(bytes, textureDir + "/" + tag + "_Normal", maxTex, true);
-                ImageTools.SetImport(p, false, true, maxTex);
+                var key = Key(gi, gm.normalTex, "normal", maxTex);
+                if (!exported.TryGetValue(key, out var p))
+                {
+                    var bytes = gi.ImageBytes(gm.normalTex, out var ext);
+                    p = ImageTools.ExportColor(bytes, textureDir + "/" + tag + "_Normal", maxTex, true);
+                    ImageTools.SetImport(p, false, true, maxTex);
+                    exported[key] = p;
+                }
                 mat.SetTexture("_BumpMap", AssetDatabase.LoadAssetAtPath<Texture2D>(p));
                 mat.SetFloat("_BumpScale", 1f);
                 mat.EnableKeyword("_NORMALMAP");
@@ -37,48 +53,49 @@ namespace RealisticClassroom.Publishing
 
             if (gm.mrTex >= 0)
             {
-                // glTF: G = roughness, B = metallic  ->  URP: R = metallic, A = smoothness
-                var mr = ImageTools.Load(gi.ImageBytes(gm.mrTex, out _));
-                int w = mr.width, h = mr.height;
+                // glTF: G = roughness, B = metallic  ->  URP: R = metallic, A = smoothness (half resolution is plenty for these maps)
                 int mapMax = Mathf.Max(512, maxTex / 2);
-                var src = ImageTools.Downsample(mr.GetPixels32(), ref w, ref h, mapMax);
-                var metal = new Color32[src.Length];
-                for (int i = 0; i < src.Length; i++)
+                var mkey = Key(gi, gm.mrTex, "mr_" + gm.metallic + "_" + gm.roughness, mapMax);
+                if (!exported.TryGetValue(mkey, out var mp))
                 {
-                    byte m = (byte)Mathf.Clamp(Mathf.RoundToInt(src[i].b * gm.metallic), 0, 255);
-                    byte s = (byte)Mathf.Clamp(Mathf.RoundToInt(255f - src[i].g * gm.roughness), 0, 255);
-                    metal[i] = new Color32(m, m, m, s);
+                    var mr = ImageTools.Load(gi.ImageBytes(gm.mrTex, out _));
+                    int w = mr.width, h = mr.height;
+                    var src = ImageTools.Downsample(mr.GetPixels32(), ref w, ref h, mapMax);
+                    var metal = new Color32[src.Length];
+                    for (int i = 0; i < src.Length; i++)
+                    {
+                        byte m = (byte)Mathf.Clamp(Mathf.RoundToInt(src[i].b * gm.metallic), 0, 255);
+                        byte s = (byte)Mathf.Clamp(Mathf.RoundToInt(255f - src[i].g * gm.roughness), 0, 255);
+                        metal[i] = new Color32(m, m, m, s);
+                    }
+                    mp = textureDir + "/" + tag + "_MetalSmooth.png";
+                    ImageTools.Write(mp, metal, w, h, false);
+                    ImageTools.SetImport(mp, false, false, mapMax);
+                    Object.DestroyImmediate(mr);
+                    exported[mkey] = mp;
                 }
-                var mp = textureDir + "/" + tag + "_MetalSmooth.png";
-                ImageTools.Write(mp, metal, w, h, false);
-                ImageTools.SetImport(mp, false, false, mapMax);
                 mat.SetTexture("_MetallicGlossMap", AssetDatabase.LoadAssetAtPath<Texture2D>(mp));
                 mat.SetFloat("_Smoothness", 1f);
                 mat.EnableKeyword("_METALLICSPECGLOSSMAP");
-                Object.DestroyImmediate(mr);
 
                 if (gm.occTex >= 0)
                 {
-                    var oc = gm.occTex == gm.mrTex ? null : ImageTools.Load(gi.ImageBytes(gm.occTex, out _));
-                    var opx = oc != null ? oc.GetPixels32() : null;
-                    int ow = w, oh = h;
-                    if (oc != null) { ow = oc.width; oh = oc.height; opx = ImageTools.Downsample(opx, ref ow, ref oh, mapMax); }
-                    var mrFull = ImageTools.Load(gi.ImageBytes(gm.mrTex, out _));
-                    int fw = mrFull.width, fh = mrFull.height;
-                    var basePx = ImageTools.Downsample(mrFull.GetPixels32(), ref fw, ref fh, mapMax);
-                    var ao = new Color32[opx != null ? opx.Length : basePx.Length];
-                    for (int i = 0; i < ao.Length; i++)
+                    var akey = Key(gi, gm.occTex, "ao", mapMax);
+                    if (!exported.TryGetValue(akey, out var ap))
                     {
-                        byte a = opx != null ? opx[i].r : basePx[i].r;
-                        ao[i] = new Color32(a, a, a, 255);
+                        var oc = ImageTools.Load(gi.ImageBytes(gm.occTex, out _));
+                        int ow = oc.width, oh = oc.height;
+                        var opx = ImageTools.Downsample(oc.GetPixels32(), ref ow, ref oh, mapMax);
+                        var ao = new Color32[opx.Length];
+                        for (int i = 0; i < ao.Length; i++) ao[i] = new Color32(opx[i].r, opx[i].r, opx[i].r, 255);
+                        ap = textureDir + "/" + tag + "_Occlusion.jpg";
+                        ImageTools.Write(ap, ao, ow, oh, true, 93);
+                        ImageTools.SetImport(ap, false, false, mapMax);
+                        Object.DestroyImmediate(oc);
+                        exported[akey] = ap;
                     }
-                    var ap = textureDir + "/" + tag + "_Occlusion.jpg";
-                    ImageTools.Write(ap, ao, opx != null ? ow : fw, opx != null ? oh : fh, true, 93);
-                    ImageTools.SetImport(ap, false, false, mapMax);
                     mat.SetTexture("_OcclusionMap", AssetDatabase.LoadAssetAtPath<Texture2D>(ap));
                     mat.EnableKeyword("_OCCLUSIONMAP");
-                    Object.DestroyImmediate(mrFull);
-                    if (oc != null) Object.DestroyImmediate(oc);
                 }
             }
             else

@@ -17,12 +17,20 @@ namespace RealisticClassroom.Publishing
 
         public static string ConvertAll()
         {
+            UrpMaterialFactory.ResetCache();
             var log = new System.Text.StringBuilder();
             var tint = new Color(0.88f, 0.93f, 0.86f);
             string texDir = Root + "/Textures/Architecture";
             var wall = UrpMaterialFactory.CreateFromPolyHavenSet(Old + "Textures/plastered_wall_04", "plastered_wall_04", Root + "/Materials/Architecture/Wall_Plaster.mat", "Wall_Plaster", texDir, tint, 2048, 0.6f, 0.5f);
             var floor = UrpMaterialFactory.CreateFromPolyHavenSet(Old + "Textures/laminate_floor_02", "laminate_floor_02", Root + "/Materials/Architecture/Floor_Laminate.mat", "Floor_Laminate", texDir, new Color(0.92f, 0.88f, 0.84f), 2048, 0.8f, 1f);
-            var ceiling = UrpMaterialFactory.CreateFromPolyHavenSet(Old + "Textures/plastered_wall_04", "plastered_wall_04", Root + "/Materials/Architecture/Ceiling_Plaster.mat", "Ceiling_Plaster", texDir, new Color(1f, 1f, 0.98f), 1024, 0.4f, 0.3f);
+            // the ceiling shares the wall plaster textures (own tint and finish), so no texture is duplicated
+            var ceilingPath = Root + "/Materials/Architecture/Ceiling_Plaster.mat";
+            AssetDatabase.DeleteAsset(ceilingPath);
+            var ceiling = new Material(wall) { name = "Ceiling_Plaster" };
+            ceiling.SetColor("_BaseColor", new Color(1f, 1f, 0.98f));
+            ceiling.SetFloat("_BumpScale", 0.4f);
+            ceiling.SetFloat("_Smoothness", 0.3f);
+            AssetDatabase.CreateAsset(ceiling, ceilingPath);
             var slate = UrpMaterialFactory.CreateFromPolyHavenSet(Old + "Textures/slate_floor_03", "slate_floor_03", Root + "/Materials/Architecture/Blackboard_Surface.mat", "Blackboard_Surface", texDir, new Color(0.26f, 0.33f, 0.28f), 1024, 0.5f, 0.35f);
             var frame = UrpMaterialFactory.CreateFromPolyHavenSet(Old + "Textures/dark_wood", "dark_wood", Root + "/Materials/Architecture/Blackboard_Frame.mat", "Blackboard_Frame", texDir, Color.white, 1024, 1f, 0.8f);
 
