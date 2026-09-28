@@ -14,3 +14,4 @@ All bundled models and textures are CC0 1.0 (public domain) unless noted.
 | Quaternius via Poly Pizza | Backpack x2, Bag, Trashcan Small (Models/Props), extra characters Casual/Hoodie/Business Man/Man in Suit/Man in Long Sleeves | CC0 |
 
 The old "Blackboard" GLB (Models/Board) is kept for reference only; the scene uses the Anthon blackboard.
+| Poly Haven | Classic Laptop, Stationery Supplies (pens), Office Notepads, Binder Notebook (desk items) | CC0 |

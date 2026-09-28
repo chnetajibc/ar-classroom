@@ -70,6 +70,7 @@ namespace ARClassroom.EditorTools
             BuildShell();
             BuildFurniture();
             BuildProps();
+            BuildDeskItems();
             BuildLighting();
             BuildPeople();
             BuildSystems();
@@ -106,10 +107,12 @@ namespace ARClassroom.EditorTools
         }
 
         /// <summary>Like Place, but scales the model so its height (Y extent) equals targetHeight.</summary>
-        static GameObject PlaceFit(Transform parent, string path, string name, Vector3 pos, float yaw, float targetHeight, Pivot pivot = Pivot.BottomCenter)
+        static GameObject PlaceFit(Transform parent, string path, string name, Vector3 pos, float yaw, float targetSize, Pivot pivot = Pivot.BottomCenter, bool byWidth = false)
         {
             var probe = Inst(path);
-            float h = WorldBounds(probe).size.y;
+            var pb = WorldBounds(probe).size;
+            float h = byWidth ? pb.x : pb.y;
+            float targetHeight = targetSize;
             Object.DestroyImmediate(probe);
             return Place(parent, path, name, pos, yaw, targetHeight / h, pivot);
         }
@@ -288,6 +291,48 @@ namespace ARClassroom.EditorTools
             var box = go.AddComponent<BoxCollider>();
             box.center = go.transform.InverseTransformPoint(worldBounds.center);
             box.size = worldBounds.size / go.transform.lossyScale.x;
+        }
+
+        // ------------------------------------------------------------------ items on every student desk
+        const float DeskTop = 0.81f;
+
+        static void BuildDeskItems()
+        {
+            var items = new GameObject("DeskItems").transform;
+            items.SetParent(props, false);
+            var rnd = new System.Random(7);
+            float J(float a) { return (float)(rnd.NextDouble() * 2 - 1) * a; }
+            for (int r = 0; r < 3; r++)
+            for (int c = 0; c < 3; c++)
+            {
+                float x = ColX[c], z = RowZ[r];
+                string id = r + "_" + c;
+                // laptop, screen toward the far edge of the desk
+                PlaceFit(items, PH + "classic_laptop/classic_laptop.gltf", "Laptop_" + id, new Vector3(x + 0.05f + J(0.01f), DeskTop, z + 0.03f + J(0.01f)), 180f + J(5f), 0.27f, Pivot.BottomCenter, true);
+                // two books stacked on the student's right... left-hand side
+                Place(items, SP + "Book.prefab", "BookA_" + id, new Vector3(x - 0.19f + J(0.01f), DeskTop, z + 0.02f + J(0.02f)), 90f + J(8f), 0.72f);
+                Place(items, SP + "Book.prefab", "BookB_" + id, new Vector3(x - 0.19f + J(0.01f), DeskTop + 0.022f, z + 0.02f + J(0.02f)), 90f + J(20f), 0.66f);
+                // two pens lying near the front edge
+                PlacePart(items, "stationery_supplies_pen_blue", "PenBlue_" + id, new Vector3(x + 0.19f + J(0.01f), DeskTop, z - 0.10f + J(0.02f)), 70f + J(25f));
+                PlacePart(items, "stationery_supplies_pen_red", "PenRed_" + id, new Vector3(x + 0.13f + J(0.01f), DeskTop, z - 0.14f + J(0.02f)), 100f + J(25f));
+            }
+        }
+
+        /// <summary>One piece (pen) of the Poly Haven stationery set, laid flat on the desk.</summary>
+        static GameObject PlacePart(Transform parent, string partName, string name, Vector3 pos, float yaw)
+        {
+            var anchor = new GameObject(name).transform;
+            anchor.SetParent(parent, false);
+            var model = Inst(PH + "stationery_supplies/stationery_supplies.gltf");
+            PrefabUtility.UnpackPrefabInstance(model, PrefabUnpackMode.Completely, InteractionMode.AutomatedAction);
+            for (int i = model.transform.childCount - 1; i >= 0; i--)
+                if (model.transform.GetChild(i).name != partName) Object.DestroyImmediate(model.transform.GetChild(i).gameObject);
+            model.transform.SetParent(anchor, false);
+            var b = WorldBounds(model);
+            model.transform.position -= new Vector3(b.center.x, b.min.y, b.center.z);
+            anchor.position = pos;
+            anchor.rotation = Quaternion.Euler(0f, yaw, 0f);
+            return anchor.gameObject;
         }
 
         // ------------------------------------------------------------------ lighting
